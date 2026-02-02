@@ -1,0 +1,74 @@
+.logoloop-container {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    padding: 1rem 0;
+}
+
+.logoloop-track {
+    display: flex;
+    width: max-content;
+    animation: scroll linear infinite;
+}
+
+.logoloop-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.logoloop-icon {
+    font-size: 2.5rem;
+    /* Default Icon size */
+    color: #888;
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: flex;
+}
+
+.logoloop-item:hover .logoloop-icon {
+    color: white;
+    transform: scale(1.1);
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        /* 
+       We have 4 copies. 
+       If we move -50%, we show the second half. 
+       Usually for a seamless loop with 2 copies, we move -50%.
+       Since we have 4 copies, moving -25% (one full set) is enough reset point 
+       IF the copies are identical.
+       Actually, standard is: track contains [set][set]. Move 0 to -50%. 
+       Or [set][set][set][set]. Move 0 to -25%.
+       
+       Let's stick to the simplest: Move -50% if we assume 2 huge sets.
+       Wait, if we use 4 copies, we can move -25% to reset to first copy position?
+       No, 
+       Start: [Set1][Set2][Set3][Set4]
+       Move until Set1 is gone (-25% width).
+       Then snap back to 0. 
+       Visually Set2 is now at Set1's position.
+       
+       So translate directly to -25%?
+       Since `transform: translateX(-25%)` of the TRACK width.
+       
+       Let's try -50% with just 2 copies? 
+       Ideally 2 copies is precise. width of track = 2 * content.
+       Moving -50% means moving 1 content width.
+       So Set2 is now at 0.
+    */
+        transform: translateX(-25%);
+        /* Reset after one full set width */
+    }
+}
+
+.pause-on-hover:hover {
+    animation-play-state: paused;
+}
