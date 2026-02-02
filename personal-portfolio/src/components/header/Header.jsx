@@ -5,12 +5,17 @@ function Header() {
     <div className="header-container">
       <ASCIIText
         enableWaves={false}
-        asciiFontSize={6}
-        text="furni"
-        textFontSize={200}
-        planeBaseHeight={2}
-        textColor="#fd86f7"
+        asciiFontSize={5}
+        text="furni.dev"
+        textFontSize={300}
+        planeBaseHeight={6}
+        textColor="#ffffff"
       />
+
+      <div id="social-media">
+        <p>Instagram</p>
+        <p>Twitter</p>
+      </div>
     </div>
   );
 }

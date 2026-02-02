@@ -1,0 +1,66 @@
+.target-cursor-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    pointer-events: none;
+    mix-blend-mode: difference;
+}
+
+.target-cursor-dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.target-cursor-corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid white;
+    z-index: 1;
+    transition: opacity 0.3s;
+}
+
+.corner-tl {
+    top: 0;
+    left: 0;
+    border-right: none;
+    border-bottom: none;
+}
+
+.corner-tr {
+    top: 0;
+    right: 0;
+    border-left: none;
+    border-bottom: none;
+}
+
+.corner-br {
+    bottom: 0;
+    right: 0;
+    border-left: none;
+    border-top: none;
+}
+
+.corner-bl {
+    bottom: 0;
+    left: 0;
+    border-right: none;
+    border-top: none;
+}
+
+/* Hide native cursor when this component is active */
+body.custom-cursor-active {
+    cursor: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .target-cursor-wrapper {
+        display: none;
+    }
+}

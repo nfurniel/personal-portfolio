@@ -487,7 +487,7 @@ export default function ASCIIText({
       ref={containerRef}
       className="ascii-text-container"
       style={{
-        position: 'absolute',
+        position: 'relative',
         width: '100%',
         height: '100%'
       }}
