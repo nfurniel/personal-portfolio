@@ -66,20 +66,21 @@ function App() {
             />
           </div>
           <div className="hero-subtitle">
-            <p style={{ display: 'inline-block', marginRight: '0.5rem' }}>
+            <p style={{ display: 'block', marginBottom: '1rem' }}>
               Estudiante de DAWE apasionado por crear experiencias web
             </p>
             <RotatingText
               texts={['modernas', 'funcionales', 'únicas', 'personalizables', 'intuitivas', 'minimalistas', 'premium']}
               mainClassName="rotating-box text-type"
-              staggerFrom="last"
+              staggerFrom="first"
               initial={{ y: "100%", opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "-120%", opacity: 0 }}
-              staggerDuration={0.045}
+              staggerDuration={0.025}
               splitLevelClassName="overflow-hidden pb-0-5"
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              rotationInterval={2000}
+              rotationInterval={2500}
+              animatePresenceMode="popLayout"
             />
           </div>
         </section>
