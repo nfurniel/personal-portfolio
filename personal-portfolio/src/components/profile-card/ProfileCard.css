@@ -477,7 +477,7 @@
 
     .pc-details p {
         font-size: 12px;
-        top: -8px;
+        top: 0;
     }
 
     .pc-user-info {
