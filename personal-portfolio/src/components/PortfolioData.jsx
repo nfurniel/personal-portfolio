@@ -18,18 +18,37 @@ import {
 
 export const portfolioData = {
     header: {
-        name: "Nicolas Furnieles",
+        name: "Nicolás Furnieles",
         title: "Full Stack Developer",
         subtitle: "Estudiante de DAWE apasionado por crear experiencias web modernas y funcionales.",
         social: {
-            linkedin: "https://www.linkedin.com/in/nicolas-furnieles-0b9117347/", // Placeholder, user can update
-            github: "https://github.com/nfurniel"
+            linkedin: "https://www.linkedin.com/in/nicolas-furnieles-0b9117347/",
+            github: "https://github.com/nfurniel",
+            email: "mailto:nicopk2018@gmail.com"
         }
     },
     about: {
         title: "Sobre Mí",
-        description: "Soy Nicolas Furnieles, estudiante de segundo año de Desarrollo de Aplicaciones Web y Escritorio (DAWE) en la UTAD. Me apasiona el desarrollo web y estoy constantemente aprendiendo nuevas tecnologías para crear aplicaciones modernas y eficientes. Actualmente estoy especializándome en desarrollo Full Stack, trabajando con tecnologías como React, PHP, Laravel y bases de datos como MySQL y MongoDB. Me encanta combinar diseño y funcionalidad para crear experiencias de usuario excepcionales."
+        description: "Soy Nicolás Furnieles, estudiante de segundo año de Desarrollo de Aplicaciones Web y Escritorio (DAWE) en la UTAD. Me apasiona el desarrollo web y estoy constantemente aprendiendo nuevas tecnologías para crear aplicaciones modernas y eficientes. Actualmente estoy especializándome en desarrollo Full Stack, trabajando con tecnologías como React, PHP, Laravel y bases de datos como MySQL y MongoDB. Me encanta combinar diseño y funcionalidad para crear experiencias de usuario excepcionales."
     },
+    philosophy: [
+        {
+            title: "Aprendizaje Continuo",
+            description: "La tecnología evoluciona constantemente. Me comprometo a mantenerme actualizado con las últimas tendencias y mejores prácticas del desarrollo web."
+        },
+        {
+            title: "Código Limpio",
+            description: "Escribir código legible y mantenible es fundamental. Me esfuerzo por seguir las mejores prácticas y convenciones de cada tecnología que utilizo."
+        },
+        {
+            title: "Diseño Responsive",
+            description: "Cada aplicación debe funcionar perfectamente en cualquier dispositivo. El diseño responsive no es opcional, es esencial."
+        },
+        {
+            title: "Experiencia de Usuario",
+            description: "La tecnología debe servir a las personas. Siempre pienso en cómo hacer que las aplicaciones sean más intuitivas y fáciles de usar."
+        }
+    ],
     experience: [
         {
             title: "Estudiante de DAWE",

@@ -4,8 +4,10 @@ import Antigravity from './antigravity/Antigravity'
 import AsciiText from './bits/AsciiText'
 import LogoLoop from './logoLoop/LogoLoop'
 import { portfolioData, logoLoopItems } from './components/PortfolioData'
+import Particles from './components/particles/Particles'
+import RotatingText from './components/rotating-text/RotatingText'
 import TargetCursor from './components/target-cursor/TargetCursor'
-import { SiLinkedin, SiGithub } from 'react-icons/si'
+import { SiLinkedin, SiGithub, SiGmail } from 'react-icons/si'
 
 function App() {
   const [isMobile, setIsMobile] = useState(false);
@@ -33,7 +35,7 @@ function App() {
           count={15}
           magnetRadius={20}
           particleSize={3}
-          ringRadius={12}
+          ringRadius={20}
           waveSpeed={0.5}
           animationSpeed={0.05}
           color="#fff"
@@ -44,22 +46,38 @@ function App() {
 
         <header className="main-header">
           <div className="header-content cursor-target">
-            <h1>{portfolioData.header.name}</h1>
-            <p>{portfolioData.header.title}</p>
+            <h1 className="text-type">{portfolioData.header.name}</h1>
+            <p className="text-type">{portfolioData.header.title}</p>
           </div>
         </header>
 
         <section className="hero-section">
           <div className="ascii-wrapper cursor-target">
             <AsciiText
-              text="NICOLAS"
+              text="NICOLÁS"
               asciiFontSize={10}
               textFontSize={isMobile ? 150 : 300}
               planeBaseHeight={isMobile ? 8 : 12}
               enableWaves={true}
             />
           </div>
-          <p className="hero-subtitle">{portfolioData.header.subtitle}</p>
+          <div className="hero-subtitle">
+            <p style={{ display: 'inline-block', marginRight: '0.5rem' }}>
+              Estudiante de DAWE apasionado por crear experiencias web
+            </p>
+            <RotatingText
+              texts={['modernas', 'funcionales', 'únicas', 'personalizables', 'intuitivas', 'minimalistas', 'premium']}
+              mainClassName="rotating-box text-type"
+              staggerFrom="last"
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "-120%", opacity: 0 }}
+              staggerDuration={0.045}
+              splitLevelClassName="overflow-hidden pb-0-5"
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              rotationInterval={2000}
+            />
+          </div>
         </section>
 
         <section className="skills-section">
@@ -79,6 +97,33 @@ function App() {
           <section className="about-section glass-card cursor-target">
             <h2>{portfolioData.about.title}</h2>
             <p>{portfolioData.about.description}</p>
+          </section>
+
+          <section className="philosophy-section">
+            <h2 className="centered-title">Mi Filosofía</h2>
+            <div className="cards-grid">
+              {portfolioData.philosophy.map((phi, index) => (
+                <div key={index} className="info-card glass-card cursor-target" style={{ position: 'relative', overflow: 'hidden' }}>
+                  <Particles
+                    particleCount={150}
+                    particleSpread={10}
+                    speed={0.2}
+                    particleColors={['#ffffff']}
+                    moveParticlesOnHover={false}
+                    particleHoverFactor={1}
+                    alphaParticles={false}
+                    particleBaseSize={60}
+                    sizeRandomness={1}
+                    cameraDistance={30}
+                    disableRotation={false}
+                  />
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    <h3>{phi.title}</h3>
+                    <p>{phi.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
 
           <section className="experience-section">
@@ -115,6 +160,9 @@ function App() {
               </a>
               <a href={portfolioData.header.social.github} target="_blank" rel="noreferrer" className="social-icon cursor-target" aria-label="GitHub">
                 <SiGithub />
+              </a>
+              <a href={portfolioData.header.social.email} className="social-icon cursor-target" aria-label="Email">
+                <SiGmail />
               </a>
             </div>
           </section>

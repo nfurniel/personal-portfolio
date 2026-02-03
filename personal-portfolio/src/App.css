@@ -40,10 +40,8 @@ body {
   width: 100%;
   padding-bottom: 4rem;
   pointer-events: none;
-  /* Let clicks pass through to canvas where empty */
 }
 
-/* Allow interaction with content */
 .content-container>* {
   pointer-events: all;
 }
@@ -69,7 +67,6 @@ body {
   font-size: 1.1rem;
 }
 
-/* Hero */
 .hero-section {
   display: flex;
   flex-direction: column;
@@ -94,7 +91,6 @@ body {
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* Skills */
 .skills-section {
   padding: 4rem 0;
   background: rgba(0, 0, 0, 0.3);
@@ -113,7 +109,6 @@ body {
   margin: 0 auto;
 }
 
-/* Main Content */
 .main-content {
   max-width: 1000px;
   margin: 0 auto;
@@ -131,7 +126,6 @@ h2 {
   display: inline-block;
 }
 
-/* Glass Cards */
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: blur(10px);
@@ -149,7 +143,6 @@ h2 {
 
 .about-section p {
   font-size: 1.3rem;
-  /* Increased from default */
   line-height: 1.8;
   color: #eeeeee;
 }
@@ -181,7 +174,7 @@ h2 {
   gap: 1.5rem;
 }
 
-/* Footer */
+
 .main-footer {
   text-align: center;
   padding: 3rem;
@@ -190,7 +183,6 @@ h2 {
   font-size: 0.9rem;
 }
 
-/* Responsive */
 @media (min-width: 768px) {
   .cards-grid {
     grid-template-columns: 1fr 1fr;
@@ -207,7 +199,6 @@ h2 {
   }
 }
 
-/* New Styles */
 .centered-title {
   display: block;
   width: 100%;
@@ -241,4 +232,26 @@ h2 {
 .social-icon:hover {
   color: var(--accent-color);
   transform: scale(1.1);
+}
+
+/* Rotating Text Utilities */
+.rotating-box {
+  background-color: var(--accent-color);
+  color: var(--bg-color);
+  padding: 0.4rem 1rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-radius: 8px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 15px rgba(255, 159, 252, 0.4);
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.pb-0-5 {
+  padding-bottom: 0.125rem;
 }

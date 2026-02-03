@@ -23,7 +23,7 @@ export default function Body() {
     },
   ];
 
-  // Alternative with image sources
+
   const imageLogos = [
     {
       src: "/logos/company1.png",
@@ -65,7 +65,7 @@ export default function Body() {
       <div
         style={{ height: "200px", position: "relative", overflow: "hidden" }}
       >
-        {/* Basic horizontal loop */}
+
         <LogoLoop
           logos={techLogos}
           speed={100}
@@ -79,7 +79,7 @@ export default function Body() {
           ariaLabel="Technology partners"
         />
 
-        {/* Vertical loop with deceleration on hover */}
+
         <LogoLoop
           logos={techLogos}
           speed={100}
