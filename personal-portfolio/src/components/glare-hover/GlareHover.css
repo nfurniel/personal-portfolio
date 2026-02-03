@@ -1,0 +1,35 @@
+.glare-hover {
+    position: relative;
+    width: var(--gh-width);
+    height: var(--gh-height);
+    background: var(--gh-bg);
+    border-radius: var(--gh-br);
+    border: 1px solid var(--gh-border);
+    overflow: hidden;
+    /* Ensure it behaves like a container */
+    display: block;
+}
+
+.glare-hover::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -200%;
+    /* Start far left */
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(var(--gh-angle),
+            transparent 0%,
+            var(--gh-rgba) 40%,
+            var(--gh-rgba) 60%,
+            transparent 100%);
+    transform: translateX(-100%);
+    transition: transform var(--gh-duration) ease-in-out;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.glare-hover:hover::before {
+    transform: translateX(200%);
+    /* Move across the element */
+}

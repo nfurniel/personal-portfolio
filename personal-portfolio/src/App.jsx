@@ -8,6 +8,10 @@ import Particles from './components/particles/Particles'
 import RotatingText from './components/rotating-text/RotatingText'
 import TargetCursor from './components/target-cursor/TargetCursor'
 import { SiLinkedin, SiGithub, SiGmail } from 'react-icons/si'
+import GlareHover from './components/glare-hover/GlareHover'
+import ScrollReveal from './scroll-reveal/ScrollReveal'
+import ProfileCard from './components/profile-card/ProfileCard'
+import profileImg from './img/img-sin-fondo.png'
 
 function App() {
   const [isMobile, setIsMobile] = useState(false);
@@ -80,6 +84,9 @@ function App() {
           </div>
         </section>
 
+
+
+
         <section className="skills-section">
           <h2 className="centered-title">Tecnologías</h2>
           <div className="logo-loop-wrapper">
@@ -94,9 +101,29 @@ function App() {
         </section>
 
         <main className="main-content">
-          <section className="about-section glass-card cursor-target">
-            <h2>{portfolioData.about.title}</h2>
-            <p>{portfolioData.about.description}</p>
+          <section className="about-section cursor-target" style={{ padding: 0 }}>
+            <ScrollReveal
+              baseOpacity={0.3}
+              enableBlur
+              baseRotation={1}
+              blurStrength={2}
+            >
+              <GlareHover
+                width="100%"
+                height="auto"
+                borderRadius="16px"
+                background="var(--glass-bg)"
+                borderColor="var(--glass-border)"
+                glareColor="#ffffff"
+                glareOpacity={0.1}
+                className="glass-card"
+              >
+                <div style={{ padding: '0' }}>
+                  <h2>{portfolioData.about.title}</h2>
+                  <p>{portfolioData.about.description}</p>
+                </div>
+              </GlareHover>
+            </ScrollReveal>
           </section>
 
           <section className="philosophy-section">
@@ -154,6 +181,25 @@ function App() {
 
           <section className="contact-section">
             <h2 className="centered-title">Contacto</h2>
+
+            <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0', perspective: '1000px' }}>
+              <ProfileCard
+                name="Nicolás Furnieles"
+                title="Desarrollador Web"
+                handle="nfurniel"
+                status="Open to Work"
+                contactText="Contactar"
+                avatarUrl={profileImg}
+                showUserInfo={true}
+                enableTilt={true}
+                enableMobileTilt={true}
+                onContactClick={() => window.open(`mailto:${portfolioData.header.social.email}`, '_blank')}
+                showIcon={false}
+                showBehindGlow={true}
+                behindGlowColor="var(--accent-color)"
+              />
+            </div>
+
             <div className="social-links">
               <a href={portfolioData.header.social.linkedin} target="_blank" rel="noreferrer" className="social-icon cursor-target" aria-label="LinkedIn">
                 <SiLinkedin />
@@ -167,6 +213,8 @@ function App() {
             </div>
           </section>
         </main>
+
+
 
         <footer className="main-footer">
           <p>© {new Date().getFullYear()} Nicolas Furnieles. All rights reserved.</p>

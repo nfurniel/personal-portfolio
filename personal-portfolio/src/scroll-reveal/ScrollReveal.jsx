@@ -20,8 +20,12 @@ const ScrollReveal = ({
 }) => {
     const containerRef = useRef(null);
 
-    const splitText = useMemo(() => {
-        const text = typeof children === 'string' ? children : '';
+    const isText = typeof children === 'string';
+
+    const content = useMemo(() => {
+        if (!isText) return children;
+
+        const text = children;
         return text.split(/(\s+)/).map((word, index) => {
             if (word.match(/^\s+$/)) return word;
             return (
@@ -30,7 +34,7 @@ const ScrollReveal = ({
                 </span>
             );
         });
-    }, [children]);
+    }, [children, isText]);
 
     useEffect(() => {
         const el = containerRef.current;
@@ -38,7 +42,7 @@ const ScrollReveal = ({
 
         const scroller = scrollContainerRef && scrollContainerRef.current ? scrollContainerRef.current : window;
 
-        gsap.fromTo(
+        const rotationTween = gsap.fromTo(
             el,
             { transformOrigin: '0% 50%', rotate: baseRotation },
             {
@@ -55,9 +59,10 @@ const ScrollReveal = ({
         );
 
         const wordElements = el.querySelectorAll('.word');
+        const targetElements = wordElements.length > 0 ? wordElements : el;
 
-        gsap.fromTo(
-            wordElements,
+        const anim1 = gsap.fromTo(
+            targetElements,
             { opacity: baseOpacity, willChange: 'opacity' },
             {
                 ease: 'none',
@@ -73,9 +78,10 @@ const ScrollReveal = ({
             }
         );
 
+        let anim2;
         if (enableBlur) {
-            gsap.fromTo(
-                wordElements,
+            anim2 = gsap.fromTo(
+                targetElements,
                 { filter: `blur(${blurStrength}px)` },
                 {
                     ease: 'none',
@@ -93,28 +99,39 @@ const ScrollReveal = ({
         }
 
         return () => {
-            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+            // Only kill triggers associated with this element's animations if possible,
+            // but relying on cleanup function scope variables is better.
+            if (anim1.scrollTrigger) anim1.scrollTrigger.kill();
+            if (anim2 && anim2.scrollTrigger) anim2.scrollTrigger.kill();
+            if (rotationTween && rotationTween.scrollTrigger) rotationTween.scrollTrigger.kill();
         };
     }, [scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength]);
 
     return (
-        <h2 ref={containerRef} className={`scroll-reveal ${containerClassName}`}>
-            <p className={`scroll-reveal-text ${textClassName}`}>{splitText}</p>
-        </h2>
+        <div ref={containerRef} className={`scroll-reveal ${containerClassName}`}>
+            {isText ? (
+                <p className={`scroll-reveal-text ${textClassName}`}>{content}</p>
+            ) : (
+                content
+            )}
+        </div>
     );
 };
 
 export default ScrollReveal;
-import ScrollReveal from './ScrollReveal';
 
-// Usage
-{/* <ScrollReveal
-  baseOpacity={0.1}
-  enableBlur
-  baseRotation={3}
-  blurStrength={4}
->
-  When does a man die? When he is hit by a bullet? No! When he suffers a disease?
-  No! When he ate a soup made out of a poisonous mushroom?
-  No! A man dies when he is forgotten!
-</ScrollReveal> */}
+
+
+// USage
+// import ScrollReveal from './ScrollReveal';
+
+// <ScrollReveal
+//   baseOpacity={0.1}
+//   enableBlur
+//   baseRotation={3}
+//   blurStrength={4}
+// >
+//   When does a man die? When he is hit by a bullet? No! When he suffers a disease?
+//   No! When he ate a soup made out of a poisonous mushroom?
+//   No! A man dies when he is forgotten!
+// </ScrollReveal>
