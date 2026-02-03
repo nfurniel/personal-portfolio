@@ -348,6 +348,7 @@ const ProfileCardComponent = ({
                                             <div className="pc-status">{status}</div>
                                         </div>
                                     </div>
+
                                     <button
                                         className="pc-contact-btn"
                                         onClick={handleContactClick}
