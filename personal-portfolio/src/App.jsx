@@ -8,6 +8,7 @@ import Particles from './components/particles/Particles'
 import RotatingText from './components/rotating-text/RotatingText'
 import TargetCursor from './components/target-cursor/TargetCursor'
 import { SiLinkedin, SiGithub, SiGmail } from 'react-icons/si'
+import { FaFileAlt } from 'react-icons/fa'
 import GlareHover from './components/glare-hover/GlareHover'
 import ScrollReveal from './scroll-reveal/ScrollReveal'
 import ProfileCard from './components/profile-card/ProfileCard'
@@ -212,10 +213,7 @@ function App() {
                 <SiGmail />
               </a>
               <a href="/nicolas-furnieles-cv.png" target="_blank" rel="noreferrer" className="social-icon cursor-target" aria-label="CV" title="Ver CV">
-                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z" />
-                  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-                </svg>
+                <FaFileAlt />
               </a>
             </div>
           </section>
