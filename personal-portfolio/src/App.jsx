@@ -222,7 +222,7 @@ function App() {
 
 
         <footer className="main-footer">
-          <p>© {new Date().getFullYear()} Nicolas Furnieles. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Nicolas Furnieles. Todos los derechos reservados.</p>
         </footer>
       </div>
     </>

@@ -234,7 +234,7 @@ h2 {
   transform: scale(1.1);
 }
 
-/* Rotating Text Utilities */
+
 .rotating-box {
   background-color: var(--accent-color);
   color: var(--bg-color);
@@ -255,3 +255,11 @@ h2 {
 .pb-0-5 {
   padding-bottom: 0.125rem;
 }
+
+
+
+.philosophy-section .glass-card {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 768px) {}
