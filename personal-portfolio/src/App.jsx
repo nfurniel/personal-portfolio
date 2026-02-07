@@ -63,7 +63,7 @@ function App() {
               asciiFontSize={10}
               textFontSize={isMobile ? 150 : 300}
               planeBaseHeight={isMobile ? 8 : 12}
-              enableWaves={true}
+              enableWaves={isMobile ? false : true}
             />
           </div>
           <div className="hero-subtitle">
