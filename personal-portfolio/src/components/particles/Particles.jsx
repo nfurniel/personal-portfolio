@@ -97,15 +97,22 @@ const Particles = ({
     sizeRandomness = 1,
     cameraDistance = 20,
     disableRotation = false,
-    pixelRatio = 1,
+    pixelRatio = Math.min(window.devicePixelRatio, 1),
     className
 }) => {
     const containerRef = useRef(null);
     const mouseRef = useRef({ x: 0, y: 0 });
+    const isVisibleRef = useRef(false);
 
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
+
+        const intersectionObserver = new IntersectionObserver(
+            entries => { isVisibleRef.current = entries[0].isIntersecting; },
+            { threshold: 0 }
+        );
+        intersectionObserver.observe(container);
 
         const renderer = new Renderer({
             dpr: pixelRatio,
@@ -188,6 +195,7 @@ const Particles = ({
 
         const update = t => {
             animationFrameId = requestAnimationFrame(update);
+            if (!isVisibleRef.current || document.hidden) return;
             const delta = t - lastTime;
             lastTime = t;
             elapsed += delta * speed;
@@ -214,6 +222,7 @@ const Particles = ({
         animationFrameId = requestAnimationFrame(update);
 
         return () => {
+            intersectionObserver.disconnect();
             window.removeEventListener('resize', resize);
             if (moveParticlesOnHover) {
                 container.removeEventListener('mousemove', handleMouseMove);

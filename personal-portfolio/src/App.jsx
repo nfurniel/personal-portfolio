@@ -151,14 +151,13 @@ function App() {
               {portfolioData.philosophy.map((phi, index) => (
                 <div key={index} className="info-card glass-card philosophy-card cursor-target" style={{ position: 'relative', overflow: 'hidden' }}>
                   <Particles
-                    particleCount={80}
+                    particleCount={40}
                     particleSpread={10}
-                    speed={0.15}
-                    particleColors={['#ffffff', 'var(--accent-color)']}
-                    moveParticlesOnHover={true}
-                    particleHoverFactor={2}
-                    alphaParticles={true}
-                    particleBaseSize={50}
+                    speed={0.1}
+                    particleColors={['#ffffff']}
+                    moveParticlesOnHover={false}
+                    alphaParticles={false}
+                    particleBaseSize={60}
                     sizeRandomness={1}
                     cameraDistance={30}
                     disableRotation={true}

@@ -172,6 +172,7 @@ const Antigravity = props => {
   return (
     <Canvas
       camera={{ position: [0, 0, 50], fov: 35 }}
+      dpr={Math.min(window.devicePixelRatio, 1)}
       eventSource={document.body}
       eventPrefix="client"
     >
