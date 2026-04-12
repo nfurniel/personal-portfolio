@@ -8,10 +8,11 @@ import Particles from './components/particles/Particles'
 import RotatingText from './components/rotating-text/RotatingText'
 import TargetCursor from './components/target-cursor/TargetCursor'
 import { SiLinkedin, SiGithub, SiGmail } from 'react-icons/si'
-import { FaFileAlt } from 'react-icons/fa'
+import { FaFileAlt, FaBook, FaCode, FaMobileAlt, FaUsers, FaGraduationCap } from 'react-icons/fa'
 import GlareHover from './components/glare-hover/GlareHover'
 import ScrollReveal from './scroll-reveal/ScrollReveal'
 import ProfileCard from './components/profile-card/ProfileCard'
+import AnimatedList from './components/animated-list'
 import profileImg from './img/img-sin-fondo.png'
 
 function App() {
@@ -25,6 +26,22 @@ function App() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  const philosophyIcons = [<FaBook />, <FaCode />, <FaMobileAlt />, <FaUsers />]
+
+  const educationItems = portfolioData.education.map((edu, i) => ({
+    id: i,
+    content: (
+      <div className="education-list-item">
+        <div className="education-list-icon"><FaGraduationCap /></div>
+        <div className="education-list-content">
+          <h3>{edu.degree}</h3>
+          <span className="subtitle">{edu.school}</span>
+          <p>{edu.description}</p>
+        </div>
+      </div>
+    )
+  }))
 
   return (
     <>
@@ -132,21 +149,22 @@ function App() {
             <h2 className="centered-title">Mi Filosofía</h2>
             <div className="cards-grid">
               {portfolioData.philosophy.map((phi, index) => (
-                <div key={index} className="info-card glass-card cursor-target" style={{ position: 'relative', overflow: 'hidden' }}>
+                <div key={index} className="info-card glass-card philosophy-card cursor-target" style={{ position: 'relative', overflow: 'hidden' }}>
                   <Particles
-                    particleCount={150}
+                    particleCount={80}
                     particleSpread={10}
-                    speed={0.2}
-                    particleColors={['#ffffff']}
-                    moveParticlesOnHover={false}
-                    particleHoverFactor={1}
-                    alphaParticles={false}
-                    particleBaseSize={60}
+                    speed={0.15}
+                    particleColors={['#ffffff', 'var(--accent-color)']}
+                    moveParticlesOnHover={true}
+                    particleHoverFactor={2}
+                    alphaParticles={true}
+                    particleBaseSize={50}
                     sizeRandomness={1}
                     cameraDistance={30}
-                    disableRotation={false}
+                    disableRotation={true}
                   />
                   <div style={{ position: 'relative', zIndex: 1 }}>
+                    <div className="philosophy-icon">{philosophyIcons[index]}</div>
                     <h3>{phi.title}</h3>
                     <p>{phi.description}</p>
                   </div>
@@ -170,15 +188,18 @@ function App() {
 
           <section className="education-section">
             <h2 className="centered-title">Educación</h2>
-            <div className="cards-grid">
-              {portfolioData.education.map((edu, index) => (
-                <div key={index} className="info-card glass-card cursor-target">
-                  <h3>{edu.degree}</h3>
-                  <span className="subtitle">{edu.school}</span>
-                  <p>{edu.description}</p>
-                </div>
-              ))}
-            </div>
+            <AnimatedList
+              items={educationItems}
+              autoAddDelay={0}
+              startFrom="top"
+              animationType="slide"
+              enterFrom="bottom"
+              fadeEdges={false}
+              height="560px"
+              itemGap={16}
+              hoverEffect="scale"
+              clickEffect="press"
+            />
           </section>
 
           <section className="contact-section">
