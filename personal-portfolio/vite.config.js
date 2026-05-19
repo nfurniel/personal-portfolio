@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -10,4 +9,27 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    target: 'es2020',
+    cssCodeSplit: true,
+    sourcemap: false,
+    minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('three') || id.includes('@react-three')) return 'three'
+            if (id.includes('gsap')) return 'gsap'
+            if (id.includes('motion')) return 'motion'
+            if (id.includes('react-icons')) return 'icons'
+            if (id.includes('ogl')) return 'ogl'
+            return 'vendor'
+          }
+        }
+      }
+    }
+  },
+  server: {
+    host: true
+  }
 })

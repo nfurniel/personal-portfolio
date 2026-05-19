@@ -1,0 +1,16 @@
+.split-text {
+  display: inline-block;
+  perspective: 800px;
+}
+
+.split-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.split-char {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+  transform-origin: 50% 100%;
+  backface-visibility: hidden;
+}

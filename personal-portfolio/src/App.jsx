@@ -1,60 +1,69 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import './App.css'
 import Antigravity from './antigravity/Antigravity'
 import AsciiText from './bits/AsciiText'
 import LogoLoop from './logoLoop/LogoLoop'
 import { portfolioData, logoLoopItems } from './components/PortfolioData'
-import Particles from './components/particles/Particles'
 import RotatingText from './components/rotating-text/RotatingText'
 import TargetCursor from './components/target-cursor/TargetCursor'
 import { SiLinkedin, SiGithub, SiGmail } from 'react-icons/si'
-import { FaFileAlt, FaBook, FaCode, FaMobileAlt, FaUsers, FaGraduationCap } from 'react-icons/fa'
+import { FaFileAlt } from 'react-icons/fa'
+import {
+  LuBookOpen,
+  LuCodeXml,
+  LuSmartphone,
+  LuUsers,
+  LuGraduationCap,
+  LuBriefcase,
+  LuFolderGit2,
+  LuRocket
+} from 'react-icons/lu'
 import GlareHover from './components/glare-hover/GlareHover'
 import ScrollReveal from './scroll-reveal/ScrollReveal'
-import ProfileCard from './components/profile-card/ProfileCard'
-import AnimatedList from './components/animated-list'
 import profileImg from './img/img-sin-fondo.png'
+import { Reveal, StaggerGroup, StaggerItem } from './components/reveal/Reveal'
+import Magnetic from './components/reveal/Magnetic'
+import SpotlightCard from './components/spotlight-card/SpotlightCard'
+import SplitText from './components/split-text/SplitText'
+
+const ProfileCard = lazy(() => import('./components/profile-card/ProfileCard'))
+
+const useMediaQuery = (query) => {
+  const [matches, setMatches] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(query).matches : false
+  )
+  useEffect(() => {
+    const mql = window.matchMedia(query)
+    const handler = (e) => setMatches(e.matches)
+    handler(mql)
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [query])
+  return matches
+}
 
 function App() {
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 768px)')
+  const isTouch = useMediaQuery('(hover: none) and (pointer: coarse)')
+  const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  const philosophyIcons = [<FaBook />, <FaCode />, <FaMobileAlt />, <FaUsers />]
-
-  const educationItems = portfolioData.education.map((edu, i) => ({
-    id: i,
-    content: (
-      <div className="education-list-item">
-        <div className="education-list-icon"><FaGraduationCap /></div>
-        <div className="education-list-content">
-          <h3>{edu.degree}</h3>
-          <span className="subtitle">{edu.school}</span>
-          <p>{edu.description}</p>
-        </div>
-      </div>
-    )
-  }))
+  const philosophyIcons = [<LuBookOpen />, <LuCodeXml />, <LuSmartphone />, <LuUsers />]
+  const experienceIcons = [<LuBriefcase />, <LuFolderGit2 />, <LuRocket />]
 
   return (
     <>
-      <TargetCursor
-        spinDuration={3}
-        hideDefaultCursor={true}
-        parallaxOn={true}
-        hoverDuration={0.3}
-      />
+      {!isTouch && (
+        <TargetCursor
+          spinDuration={3}
+          hideDefaultCursor={true}
+          parallaxOn={true}
+          hoverDuration={0.3}
+        />
+      )}
 
-      <div className="canvas-container">
+      <div className="canvas-container" aria-hidden="true">
         <Antigravity
-          count={15}
+          count={isMobile ? 8 : 15}
           magnetRadius={20}
           particleSize={3}
           ringRadius={20}
@@ -65,11 +74,16 @@ function App() {
       </div>
 
       <div className="content-container">
-
         <header className="main-header">
           <div className="header-content cursor-target">
-            <h1 className="text-type">{portfolioData.header.name}</h1>
-            <p className="text-type">{portfolioData.header.title}</p>
+            <h1 className="text-type">
+              <SplitText as="span" variant="rise" stagger={0.04} duration={0.9}>
+                {portfolioData.header.name}
+              </SplitText>
+            </h1>
+            <Reveal as="p" className="text-type" delay={0.4} y={12}>
+              {portfolioData.header.title}
+            </Reveal>
           </div>
         </header>
 
@@ -80,10 +94,10 @@ function App() {
               asciiFontSize={10}
               textFontSize={isMobile ? 150 : 300}
               planeBaseHeight={isMobile ? 8 : 12}
-              enableWaves={isMobile ? false : true}
+              enableWaves={!isMobile && !reduceMotion}
             />
           </div>
-          <div className="hero-subtitle">
+          <Reveal className="hero-subtitle" delay={0.2}>
             <p style={{ display: 'block', marginBottom: '1rem' }}>
               Estudiante de DAWE apasionado por crear experiencias web
             </p>
@@ -100,21 +114,20 @@ function App() {
               rotationInterval={2500}
               animatePresenceMode="popLayout"
             />
-          </div>
+          </Reveal>
         </section>
 
-
-
-
         <section className="skills-section">
-          <h2 className="centered-title">Tecnologías</h2>
+          <h2 className="centered-title">
+            <SplitText variant="fadeUp" stagger={0.03}>Tecnologías</SplitText>
+          </h2>
           <div className="logo-loop-wrapper">
             <LogoLoop
               logos={logoLoopItems}
               speed={40}
               direction="left"
-              gap={40}
-              pauseOnHover={true}
+              gap={isMobile ? 28 : 40}
+              pauseOnHover={!isTouch}
             />
           </div>
         </section>
@@ -123,8 +136,8 @@ function App() {
           <section className="about-section cursor-target" style={{ padding: 0 }}>
             <ScrollReveal
               baseOpacity={0.3}
-              enableBlur
-              baseRotation={1}
+              enableBlur={!reduceMotion}
+              baseRotation={reduceMotion ? 0 : 1}
               blurStrength={2}
             >
               <GlareHover
@@ -146,100 +159,131 @@ function App() {
           </section>
 
           <section className="philosophy-section">
-            <h2 className="centered-title">Mi Filosofía</h2>
-            <div className="cards-grid">
+            <h2 className="centered-title">
+              <SplitText variant="fadeUp" stagger={0.03}>Mi Filosofía</SplitText>
+            </h2>
+            <StaggerGroup className="cards-grid" staggerChildren={0.1}>
               {portfolioData.philosophy.map((phi, index) => (
-                <div key={index} className="info-card glass-card philosophy-card cursor-target" style={{ position: 'relative', overflow: 'hidden' }}>
-                  <Particles
-                    particleCount={40}
-                    particleSpread={10}
-                    speed={0.1}
-                    particleColors={['#ffffff']}
-                    moveParticlesOnHover={false}
-                    alphaParticles={false}
-                    particleBaseSize={60}
-                    sizeRandomness={1}
-                    cameraDistance={30}
-                    disableRotation={true}
-                  />
-                  <div style={{ position: 'relative', zIndex: 1 }}>
-                    <div className="philosophy-icon">{philosophyIcons[index]}</div>
-                    <h3>{phi.title}</h3>
-                    <p>{phi.description}</p>
-                  </div>
-                </div>
+                <StaggerItem key={index}>
+                  <SpotlightCard
+                    className="cursor-target"
+                    icon={philosophyIcons[index]}
+                    index={index + 1}
+                  >
+                    <h3 className="spotlight-card__title">{phi.title}</h3>
+                    <p className="spotlight-card__text">{phi.description}</p>
+                  </SpotlightCard>
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerGroup>
           </section>
 
           <section className="experience-section">
-            <h2 className="centered-title">Experiencia y Proyectos</h2>
-            <div className="cards-grid">
+            <h2 className="centered-title">
+              <SplitText variant="fadeUp" stagger={0.03}>Experiencia y Proyectos</SplitText>
+            </h2>
+            <StaggerGroup className="cards-grid" staggerChildren={0.12}>
               {portfolioData.experience.map((exp, index) => (
-                <div key={index} className="info-card glass-card cursor-target">
-                  <h3>{exp.title}</h3>
-                  <span className="subtitle">{exp.company} | {exp.period}</span>
-                  <p>{exp.description}</p>
-                </div>
+                <StaggerItem key={index}>
+                  <SpotlightCard
+                    className="cursor-target"
+                    icon={experienceIcons[index] || <LuBriefcase />}
+                    index={index + 1}
+                    footer={exp.period}
+                  >
+                    <span className="spotlight-card__meta">
+                      <span className="spotlight-card__meta-dot" aria-hidden="true" />
+                      {exp.company}
+                    </span>
+                    <h3 className="spotlight-card__title">{exp.title}</h3>
+                    <p className="spotlight-card__text">{exp.description}</p>
+                  </SpotlightCard>
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerGroup>
           </section>
 
           <section className="education-section">
-            <h2 className="centered-title">Educación</h2>
-            <AnimatedList
-              items={educationItems}
-              autoAddDelay={0}
-              startFrom="top"
-              animationType="slide"
-              enterFrom="bottom"
-              fadeEdges={false}
-              height="560px"
-              itemGap={16}
-              hoverEffect="scale"
-              clickEffect="press"
-            />
+            <h2 className="centered-title">
+              <SplitText variant="fadeUp" stagger={0.03}>Educación</SplitText>
+            </h2>
+            <StaggerGroup className="education-grid" staggerChildren={0.1}>
+              {portfolioData.education.map((edu, index) => (
+                <StaggerItem key={index}>
+                  <SpotlightCard
+                    className="cursor-target"
+                    icon={<LuGraduationCap />}
+                    index={index + 1}
+                  >
+                    <span className="spotlight-card__meta">
+                      <span className="spotlight-card__meta-dot" aria-hidden="true" />
+                      {edu.school}
+                    </span>
+                    <h3 className="spotlight-card__title">{edu.degree}</h3>
+                    <p className="spotlight-card__text">{edu.description}</p>
+                  </SpotlightCard>
+                </StaggerItem>
+              ))}
+            </StaggerGroup>
           </section>
 
           <section className="contact-section">
-            <h2 className="centered-title">Contacto</h2>
+            <h2 className="centered-title">
+              <SplitText variant="fadeUp" stagger={0.03}>Contacto</SplitText>
+            </h2>
 
-            <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0', perspective: '1000px' }}>
-              <ProfileCard
-                name="Nicolás Furnieles"
-                title="Desarrollador Web"
-                handle="nfurniel"
-                status="Open to Work"
-                contactText="Contactar"
-                avatarUrl={profileImg}
-                showUserInfo={true}
-                enableTilt={true}
-                enableMobileTilt={true}
-                onContactClick={() => window.open(`mailto:${portfolioData.header.social.email}`, '_blank')}
-                showIcon={false}
-                showBehindGlow={true}
-                behindGlowColor="var(--accent-color)"
-              />
+            <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0', perspective: '1000px', width: '100%' }}>
+              <Suspense fallback={<div style={{ width: 280, height: 360 }} />}>
+                <ProfileCard
+                  name="Nicolás Furnieles"
+                  title="Desarrollador Web"
+                  handle="nfurniel"
+                  status="Open to Work"
+                  contactText="Contactar"
+                  avatarUrl={profileImg}
+                  showUserInfo={true}
+                  enableTilt={!isTouch}
+                  enableMobileTilt={false}
+                  onContactClick={() => window.open(`mailto:${portfolioData.header.social.email}`, '_blank')}
+                  showIcon={false}
+                  showBehindGlow={true}
+                  behindGlowColor="var(--accent-color)"
+                />
+              </Suspense>
             </div>
 
-            <div className="social-links">
-              <a href={portfolioData.header.social.linkedin} target="_blank" rel="noreferrer" className="social-icon cursor-target" aria-label="LinkedIn">
-                <SiLinkedin />
-              </a>
-              <a href={portfolioData.header.social.github} target="_blank" rel="noreferrer" className="social-icon cursor-target" aria-label="GitHub">
-                <SiGithub />
-              </a>
-              <a href={portfolioData.header.social.email} className="social-icon cursor-target" aria-label="Email">
-                <SiGmail />
-              </a>
-              <a href="/nicolas-furnieles-cv.png" target="_blank" rel="noreferrer" className="social-icon cursor-target" aria-label="CV" title="Ver CV">
-                <FaFileAlt />
-              </a>
-            </div>
+            <StaggerGroup className="social-links" staggerChildren={0.08}>
+              <StaggerItem>
+                <Magnetic strength={isTouch ? 0 : 0.35}>
+                  <a href={portfolioData.header.social.linkedin} target="_blank" rel="noreferrer" className="social-icon cursor-target" aria-label="LinkedIn">
+                    <SiLinkedin />
+                  </a>
+                </Magnetic>
+              </StaggerItem>
+              <StaggerItem>
+                <Magnetic strength={isTouch ? 0 : 0.35}>
+                  <a href={portfolioData.header.social.github} target="_blank" rel="noreferrer" className="social-icon cursor-target" aria-label="GitHub">
+                    <SiGithub />
+                  </a>
+                </Magnetic>
+              </StaggerItem>
+              <StaggerItem>
+                <Magnetic strength={isTouch ? 0 : 0.35}>
+                  <a href={portfolioData.header.social.email} className="social-icon cursor-target" aria-label="Email">
+                    <SiGmail />
+                  </a>
+                </Magnetic>
+              </StaggerItem>
+              <StaggerItem>
+                <Magnetic strength={isTouch ? 0 : 0.35}>
+                  <a href="/nicolas-furnieles-cv.png" target="_blank" rel="noreferrer" className="social-icon cursor-target" aria-label="CV" title="Ver CV">
+                    <FaFileAlt />
+                  </a>
+                </Magnetic>
+              </StaggerItem>
+            </StaggerGroup>
           </section>
         </main>
-
-
 
         <footer className="main-footer">
           <p>© {new Date().getFullYear()} Nicolas Furnieles. Todos los derechos reservados.</p>
