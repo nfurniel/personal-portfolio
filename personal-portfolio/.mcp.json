@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "./node_modules/shadcn/dist/index.js",
+        "mcp"
+      ],
+      "env": {
+        "NODE_OPTIONS": "--use-system-ca"
+      }
+    }
+  }
+}

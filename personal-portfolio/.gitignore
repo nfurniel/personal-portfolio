@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Local Claude Code state (may contain plaintext secrets in permission rules)
+.claude/
+SKILL.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

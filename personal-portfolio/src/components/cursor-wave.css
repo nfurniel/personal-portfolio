@@ -1,0 +1,20 @@
+.cursor-wave-root {
+  position: relative;
+  overflow: hidden;
+}
+
+.cursor-wave-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cursor-wave-content {
+  pointer-events: none;
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+}

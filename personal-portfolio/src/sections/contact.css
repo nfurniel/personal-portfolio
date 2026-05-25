@@ -1,0 +1,276 @@
+.contact {
+  position: relative;
+  width: 100%;
+}
+
+.contact__container {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact__card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+  isolation: isolate;
+}
+
+.contact__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 50% 0%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--background) 0%, color-mix(in oklab, var(--accent) 4%, var(--background)) 100%);
+}
+
+.contact__bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  mix-blend-mode: normal;
+  will-change: transform;
+}
+
+.contact__bg-blob--a {
+  width: 36rem;
+  height: 36rem;
+  background: radial-gradient(circle, color-mix(in oklab, var(--accent) 70%, transparent) 0%, transparent 70%);
+  top: -10rem;
+  left: -8rem;
+  animation: blob-float-a 14s ease-in-out infinite;
+}
+
+.contact__bg-blob--b {
+  width: 28rem;
+  height: 28rem;
+  background: radial-gradient(circle, color-mix(in oklab, #c4b5fd 65%, transparent) 0%, transparent 70%);
+  bottom: -8rem;
+  right: -6rem;
+  animation: blob-float-b 17s ease-in-out infinite;
+}
+
+.contact__bg-blob--c {
+  width: 22rem;
+  height: 22rem;
+  background: radial-gradient(circle, color-mix(in oklab, var(--foreground) 12%, transparent) 0%, transparent 70%);
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: blob-float-c 20s ease-in-out infinite;
+}
+
+.dark .contact__bg-blob--a,
+[data-theme='dark'] .contact__bg-blob--a {
+  background: radial-gradient(circle, rgba(82, 39, 255, 0.65) 0%, transparent 70%);
+  opacity: 0.7;
+}
+.dark .contact__bg-blob--b,
+[data-theme='dark'] .contact__bg-blob--b {
+  background: radial-gradient(circle, rgba(124, 255, 103, 0.32) 0%, transparent 70%);
+  opacity: 0.5;
+}
+.dark .contact__bg-blob--c,
+[data-theme='dark'] .contact__bg-blob--c {
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.32) 0%, transparent 70%);
+}
+
+@keyframes blob-float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(4rem, 2rem) scale(1.05); }
+  66% { transform: translate(-2rem, 4rem) scale(0.95); }
+}
+@keyframes blob-float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-3rem, -3rem) scale(1.08); }
+}
+@keyframes blob-float-c {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-40%, -55%) scale(1.1); }
+}
+
+.contact__bg-noise {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 25% 30%, rgba(0, 0, 0, 0.018) 0.5px, transparent 1px),
+    radial-gradient(circle at 70% 65%, rgba(0, 0, 0, 0.022) 0.5px, transparent 1px),
+    radial-gradient(circle at 45% 85%, rgba(0, 0, 0, 0.018) 0.5px, transparent 1px);
+  background-size: 24px 24px, 32px 32px, 18px 18px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.dark .contact__bg-noise,
+[data-theme='dark'] .contact__bg-noise {
+  background-image:
+    radial-gradient(circle at 25% 30%, rgba(255, 255, 255, 0.025) 0.5px, transparent 1px),
+    radial-gradient(circle at 70% 65%, rgba(255, 255, 255, 0.03) 0.5px, transparent 1px),
+    radial-gradient(circle at 45% 85%, rgba(255, 255, 255, 0.025) 0.5px, transparent 1px);
+}
+
+.contact__inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: clamp(2rem, 5vw, 3.5rem);
+}
+
+.contact__top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 860px) {
+  .contact__top {
+    grid-template-columns: 1.4fr 1fr;
+    gap: 3rem;
+  }
+}
+
+.contact__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-width: 38rem;
+}
+
+.contact__title {
+  margin-top: 0.1rem;
+}
+
+.contact__title .shiny-text {
+  background-image: linear-gradient(110deg, currentColor 0%, currentColor 35%, #ffffff 50%, currentColor 65%, currentColor 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.contact__lede {
+  max-width: 38ch;
+}
+
+.contact__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.contact__quick {
+  list-style: none;
+  margin: 0;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--foreground-8);
+  background: color-mix(in oklab, var(--background) 70%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.contact__quick-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.contact__quick-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 10px;
+  background: var(--muted);
+  color: var(--foreground);
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.contact__quick-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.contact__quick-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.contact__quick-value {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--foreground);
+}
+
+.contact__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--foreground-8);
+}
+
+@media (min-width: 540px) {
+  .contact__footer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.contact__socials {
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.contact__social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--background) 85%, transparent);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  font-size: 1.05rem;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.contact__social:hover {
+  background: var(--foreground);
+  color: var(--background);
+  border-color: var(--foreground);
+  transform: translateY(-1px);
+}
+
+.contact__copyright {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--muted-foreground);
+  letter-spacing: 0.01em;
+}
