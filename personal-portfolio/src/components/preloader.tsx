@@ -173,35 +173,29 @@ const Preloader: React.FC<PreloaderProps> = ({
         onLoadingStart?.();
       }
 
-      // Only the `percentage` variant displays the numeric progress, so only it needs
-      // a per-frame React re-render. Other variants (stairs, circle, slide, curtain)
-      // get a single state update for hideText when needed. Re-rendering 17 letter
-      // spans + 10 stair motion divs every frame murders the animation.
-      if (variant === 'percentage') {
-        const updateProgress = () => {
-          if (!isActive) return;
+      const updateProgress = () => {
+        if (!isActive) return;
 
-          const elapsed = Date.now() - startTime;
-          let newProgress = (elapsed / duration) * 100;
+        const elapsed = Date.now() - startTime;
+        let newProgress = (elapsed / duration) * 100;
 
-          if (newProgress > 90) {
-            const excess = newProgress - 90;
-            newProgress = 90 + excess * 0.1;
-          }
+        if (newProgress > 90) {
+          const excess = newProgress - 90;
+          newProgress = 90 + excess * 0.1;
+        }
 
-          newProgress = Math.min(newProgress, 99);
-          setProgress(newProgress);
+        newProgress = Math.min(newProgress, 99);
+        setProgress(newProgress);
 
-          if (newProgress >= textFadeThreshold && !textHiddenRef.current) {
-            textHiddenRef.current = true;
-            setHideText(true);
-          }
+        if (newProgress >= textFadeThreshold && !textHiddenRef.current) {
+          textHiddenRef.current = true;
+          setHideText(true);
+        }
 
-          rafRef.current = requestAnimationFrame(updateProgress);
-        };
+        rafRef.current = requestAnimationFrame(updateProgress);
+      };
 
-        updateProgress();
-      }
+      updateProgress();
 
       return () => {
         isActive = false;
@@ -260,13 +254,23 @@ const Preloader: React.FC<PreloaderProps> = ({
       <div className="preloader-loading-text" style={{ zIndex: zIndex + 1 }}>
         <div className="preloader-loading-text-wrapper">
           {words.map((word, index) => (
-            <span
+            <motion.span
               key={index}
-              className={`preloader-loading-text-word preloader-letter-css ${hideText ? 'is-hiding' : ''} ${textClassName}`}
-              style={{ animationDelay: `${hideText ? 0 : index * 0.03}s` }}
+              initial={{ opacity: 0, filter: "blur(10px)" }}
+              animate={
+                hideText
+                  ? { opacity: 0, filter: "blur(10px)" }
+                  : { opacity: 1, filter: "blur(0px)" }
+              }
+              transition={{
+                duration: hideText ? 0.25 : 0.4,
+                delay: hideText ? 0 : index * 0.04,
+                ease: [0.65, 0, 0.35, 1],
+              }}
+              className={`preloader-loading-text-word ${textClassName}`}
             >
               {word}
-            </span>
+            </motion.span>
           ))}
         </div>
       </div>

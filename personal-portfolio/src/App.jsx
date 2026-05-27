@@ -59,20 +59,14 @@ function useAppReady(minMs = 700) {
   return ready
 }
 
-const STAIR_COLOR = '#0a0a0a'
+const PRELOADER_BG = '#0a0a0a'
 
 export default function App() {
   const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const isMobile = useMediaQuery('(max-width: 768px)')
   const sparkColor = useThemeAwareSparkColor()
-  const appReady = useAppReady(1000)
-  // `contentMounted` is flipped after the preloader's exit animation completes.
-  // Mounting the heavy app earlier (Hero+PortraitMorph WebGL, 4 MetallicPaint canvases,
-  // PageBackdrop, all motion-react components) blocks the main thread for 200-300ms,
-  // which the user perceives as the preloader animation stuttering.
-  const [contentMounted, setContentMounted] = useState(false)
-  // Don't run Lenis's smooth-scroll RAF while the preloader covers the screen.
-  useLenis({ enabled: !reduceMotion && contentMounted })
+  const appReady = useAppReady(1200)
+  useLenis({ enabled: !reduceMotion })
 
   const cleanEmail = portfolioData.header.social.email.replace('mailto:', '')
 
@@ -107,34 +101,20 @@ export default function App() {
   if (reduceMotion) return withSpark
 
   return (
-    <>
-      {/* Page background visible from the start, so the brief gap between preloader
-          exit and content mount doesn't flash an empty white screen. */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 0,
-          background: STAIR_COLOR,
-        }}
-      />
-      <Preloader
-        loading={!appReady}
-        variant="stairs"
-        position="fixed"
-        bgColor={STAIR_COLOR}
-        loadingText="Nicolás Furnieles"
-        stairCount={10}
-        stairsRevealFrom="center"
-        stairsRevealDirection="up"
-        duration={1000}
-        zIndex={9999}
-        ariaLabel="Cargando portfolio"
-        onLoadingComplete={() => setContentMounted(true)}
-      >
-        {contentMounted ? withSpark : null}
-      </Preloader>
-    </>
+    <Preloader
+      loading={!appReady}
+      variant="stairs"
+      position="fixed"
+      bgColor={PRELOADER_BG}
+      loadingText="Nicolás Furnieles"
+      stairCount={10}
+      stairsRevealFrom="center"
+      stairsRevealDirection="up"
+      duration={1500}
+      zIndex={9999}
+      ariaLabel="Cargando portfolio"
+    >
+      {withSpark}
+    </Preloader>
   )
 }

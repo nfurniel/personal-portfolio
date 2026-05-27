@@ -308,9 +308,8 @@ html.lenis body {
 .preloader-wrapper {
   min-height: 100dvh;
 }
-/* Loading text — always white on top of the dark/purple stairs.
-   Uses !important to win against the preloader's `@media (prefers-color-scheme)` rules
-   that try to apply `hsl(var(--background))` (invalid for our hex tokens). */
+/* Loading text — white on the dark preloader background.
+   Uses !important to override the preloader's broken `hsl(var(--token))` rules. */
 .preloader-loading-text-wrapper .preloader-loading-text-word,
 .preloader-loading-text .preloader-loading-text-word {
   color: #ffffff !important;
@@ -318,26 +317,6 @@ html.lenis body {
   font-weight: 600;
   letter-spacing: -0.02em;
   font-size: clamp(2rem, 6vw, 4rem);
-  will-change: transform, opacity;
-}
-
-/* Compositor-driven entrance/exit for each letter — immune to main-thread jank */
-.preloader-letter-css {
-  display: inline-block;
-  transform: translate3d(0, 14px, 0);
-  opacity: 0;
-  animation: preloader-letter-in 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-.preloader-letter-css.is-hiding {
-  animation: preloader-letter-out 0.22s cubic-bezier(0.55, 0, 0.55, 0.2) forwards;
-}
-@keyframes preloader-letter-in {
-  from { transform: translate3d(0, 14px, 0); opacity: 0; }
-  to   { transform: translate3d(0, 0, 0);    opacity: 1; }
-}
-@keyframes preloader-letter-out {
-  from { transform: translate3d(0, 0, 0);  opacity: 1; }
-  to   { transform: translate3d(0, -8px, 0); opacity: 0; }
 }
 
 /* ---------- REDUCED MOTION ---------- */
