@@ -1,7 +1,7 @@
 import { motion } from 'motion/react'
-import { SiJavascript, SiTypescript, SiPython, SiReact } from 'react-icons/si'
 import { LuArrowUpRight, LuGithub, LuExternalLink } from 'react-icons/lu'
 import { FadeIn } from '../lib/motion-primitives'
+import MetallicPaint from '../components/metallic-paint/MetallicPaint'
 import './projects.css'
 
 const EASE = [0.22, 1, 0.36, 1]
@@ -12,10 +12,11 @@ const PROJECTS = [
     title: 'Quick Arrival App',
     tag: 'Proyecto fin de ciclo · 2025',
     description: 'Aplicación web que facilita la gestión de llegadas y reservas. Mi proyecto final del ciclo de DAWE.',
-    accent: '#f7df1e',
-    accentText: '#1a1a1a',
-    icon: <SiJavascript />,
-    techs: ['JavaScript', 'React', 'Node'],
+    accent: '#61dafb',
+    accentText: '#ffffff',
+    iconSrc: '/icons/react.svg',
+    iconTint: '#a5e8ff',
+    techs: ['React', 'JavaScript', 'Node'],
     github: 'https://github.com/nfurniel/Quick-Arrival-App',
     demo: 'https://quick-arrival-app.vercel.app',
   },
@@ -26,7 +27,8 @@ const PROJECTS = [
     description: 'API REST de astronomía construida con FastAPI. Endpoints sobre planetas, datos espaciales y más.',
     accent: '#3776ab',
     accentText: '#ffffff',
-    icon: <SiPython />,
+    iconSrc: '/icons/python.svg',
+    iconTint: '#ffd966',
     techs: ['Python', 'FastAPI', 'REST'],
     github: 'https://github.com/nfurniel/cosmos-api',
     demo: 'https://cosmos-api-production.onrender.com/',
@@ -39,7 +41,8 @@ const PROJECTS = [
     description: 'Sistema para visualizar y gestionar puntos de carga de coches eléctricos. Construido en TypeScript.',
     accent: '#3178c6',
     accentText: '#ffffff',
-    icon: <SiTypescript />,
+    iconSrc: '/icons/typescript.svg',
+    iconTint: '#9cc4ff',
     techs: ['TypeScript', 'React'],
     github: 'https://github.com/nfurniel/PROYECTO-EV-CHARGERS',
     demo: 'https://proyecto-ev-chargers.vercel.app',
@@ -49,9 +52,10 @@ const PROJECTS = [
     title: 'Eat & Rest',
     tag: 'Personal · 2025',
     description: 'Web ligera para descubrir restaurantes y zonas de descanso. Front en JavaScript con foco en UX simple.',
-    accent: '#ff7849',
+    accent: '#f7df1e',
     accentText: '#ffffff',
-    icon: <SiReact />,
+    iconSrc: '/icons/javascript.svg',
+    iconTint: '#fff3a0',
     techs: ['JavaScript', 'React'],
     github: 'https://github.com/nfurniel/eat-and-rest',
     demo: 'https://eat-and-rest.vercel.app',
@@ -76,7 +80,19 @@ function ProjectCard({ project, index }) {
         style={{ '--accent': project.accent, '--accent-text': project.accentText }}
       >
         <div className="proj-card__media-bg" />
-        <div className="proj-card__icon">{project.icon}</div>
+        <div className="proj-card__icon">
+          <MetallicPaint
+            imageSrc={project.iconSrc}
+            tintColor={project.iconTint}
+            size={420}
+            scale={3.2}
+            speed={0.22}
+            liquid={0.6}
+            brightness={1.9}
+            contrast={0.55}
+            chromaticSpread={1.6}
+          />
+        </div>
         <span className="proj-card__media-corner" aria-hidden="true">
           <LuArrowUpRight />
         </span>

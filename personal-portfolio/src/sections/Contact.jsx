@@ -1,9 +1,26 @@
+import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { SiLinkedin, SiGithub, SiGmail } from 'react-icons/si'
 import { LuArrowRight, LuMapPin, LuClock, LuBriefcase } from 'react-icons/lu'
 import ContactButton from '../components/contact-card/ContactButton'
 import ShinyText from '../components/ShinyText'
+import BorderGlow from '../components/border-glow/BorderGlow'
 import './contact.css'
+
+function useThemeAwareGlow() {
+  const [theme, setTheme] = useState(() =>
+    typeof document !== 'undefined' ? document.documentElement.getAttribute('data-theme') : 'light'
+  )
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    const update = () => setTheme(document.documentElement.getAttribute('data-theme') || 'light')
+    update()
+    const mo = new MutationObserver(update)
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] })
+    return () => mo.disconnect()
+  }, [])
+  return theme
+}
 
 const EASE = [0.22, 1, 0.36, 1]
 
@@ -14,15 +31,34 @@ const QUICK_INFO = [
 ]
 
 export default function Contact({ email, linkedin, github }) {
+  const theme = useThemeAwareGlow()
+  const isDark = theme === 'dark'
+  const cardBg = isDark ? '#0f0f10' : '#f8f9fc'
+  const glowColor = isDark ? '240 90% 70%' : '230 80% 60%'
+  const glowColors = isDark
+    ? ['#a78bfa', '#7c3aed', '#22d3ee']
+    : ['#3b82f6', '#a78bfa', '#06b6d4']
+
   return (
     <section id="contact" className="contact">
       <div className="container contact__container">
-        <motion.article
-          className="contact__card"
+        <motion.div
+          className="contact__card-wrap"
           initial={{ opacity: 0, y: 18, filter: 'blur(8px)' }}
           whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           viewport={{ once: true, margin: '-15%' }}
           transition={{ duration: 0.8, ease: EASE }}
+        >
+        <BorderGlow
+          className="contact__card"
+          backgroundColor={cardBg}
+          glowColor={glowColor}
+          colors={glowColors}
+          borderRadius={32}
+          glowRadius={48}
+          glowIntensity={1.1}
+          coneSpread={28}
+          fillOpacity={0.45}
         >
           <div className="contact__bg" aria-hidden="true">
             <div className="contact__bg-blob contact__bg-blob--a" />
@@ -96,7 +132,8 @@ export default function Contact({ email, linkedin, github }) {
               <p className="contact__copyright">© {new Date().getFullYear()} Nicolás Furnieles</p>
             </div>
           </div>
-        </motion.article>
+        </BorderGlow>
+        </motion.div>
       </div>
     </section>
   )
