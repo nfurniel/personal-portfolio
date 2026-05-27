@@ -380,18 +380,34 @@ export default function MetallicPaint({
   }, []);
 
   useEffect(() => {
-    if (!initGL()) return;
+    // Defer GL init off the main critical path so the preloader can paint smoothly.
+    // Shader compilation across 4 simultaneous canvases would otherwise stall the
+    // first paint by 50-200 ms.
+    let mounted = true;
+    const idle = (cb) =>
+      typeof requestIdleCallback === 'function'
+        ? requestIdleCallback(cb, { timeout: 500 })
+        : setTimeout(cb, 60);
+    const cancelIdle = (handle) =>
+      typeof cancelIdleCallback === 'function' && typeof handle === 'number'
+        ? cancelIdleCallback(handle)
+        : clearTimeout(handle);
 
-    const canvas = canvasRef.current;
-    const gl = glRef.current;
-    const side = size * Math.min(devicePixelRatio, 2);
-    canvas.width = side;
-    canvas.height = side;
-    gl.viewport(0, 0, side, side);
-
-    setReady(true);
+    const handle = idle(() => {
+      if (!mounted) return;
+      if (!initGL()) return;
+      const canvas = canvasRef.current;
+      const gl = glRef.current;
+      const side = size * Math.min(devicePixelRatio, 2);
+      canvas.width = side;
+      canvas.height = side;
+      gl.viewport(0, 0, side, side);
+      setReady(true);
+    });
 
     return () => {
+      mounted = false;
+      cancelIdle(handle);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (textureRef.current && glRef.current) {
         glRef.current.deleteTexture(textureRef.current);
@@ -469,6 +485,8 @@ export default function MetallicPaint({
     const u = uniformsRef.current;
     const canvas = canvasRef.current;
     const mouse = mouseRef.current;
+    let visible = true;
+    let docVisible = typeof document !== 'undefined' ? document.visibilityState !== 'hidden' : true;
 
     const handleMouseMove = e => {
       const rect = canvas.getBoundingClientRect();
@@ -477,6 +495,18 @@ export default function MetallicPaint({
     };
 
     canvas.addEventListener('mousemove', handleMouseMove);
+
+    const start = () => {
+      if (rafRef.current) return;
+      lastTimeRef.current = performance.now();
+      rafRef.current = requestAnimationFrame(render);
+    };
+    const stop = () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
 
     const render = time => {
       const delta = time - lastTimeRef.current;
@@ -495,11 +525,29 @@ export default function MetallicPaint({
       rafRef.current = requestAnimationFrame(render);
     };
 
-    lastTimeRef.current = performance.now();
-    rafRef.current = requestAnimationFrame(render);
+    const io = new IntersectionObserver(
+      entries => {
+        visible = entries[0]?.isIntersecting ?? true;
+        if (visible && docVisible) start();
+        else stop();
+      },
+      { rootMargin: '120px' }
+    );
+    io.observe(canvas);
+
+    const onVis = () => {
+      docVisible = document.visibilityState !== 'hidden';
+      if (visible && docVisible) start();
+      else stop();
+    };
+    document.addEventListener('visibilitychange', onVis);
+
+    start();
 
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      stop();
+      io.disconnect();
+      document.removeEventListener('visibilitychange', onVis);
       canvas.removeEventListener('mousemove', handleMouseMove);
     };
   }, [ready, textureReady]);

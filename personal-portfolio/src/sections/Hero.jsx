@@ -1,5 +1,5 @@
 import { LuArrowRight } from 'react-icons/lu'
-import profileImg from '../img/img-sin-fondo.png'
+import profileImg from '../img/img-sin-fondo.webp'
 import ContactButton from '../components/contact-card/ContactButton'
 import PortraitMorph from '../components/portrait-morph/PortraitMorph'
 import ShinyText from '../components/ShinyText'

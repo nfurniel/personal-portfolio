@@ -112,6 +112,27 @@ export default function PortraitMorph({ src, alt, className }) {
     const container = containerRef.current
     if (!container) return
 
+    let cleanup = () => {}
+    let cancelled = false
+    const idle = (cb) =>
+      typeof requestIdleCallback === 'function'
+        ? requestIdleCallback(cb, { timeout: 500 })
+        : setTimeout(cb, 50)
+    const cancelIdle = (h) =>
+      typeof cancelIdleCallback === 'function' && typeof h === 'number'
+        ? cancelIdleCallback(h)
+        : clearTimeout(h)
+    const idleHandle = idle(() => {
+      if (cancelled) return
+      cleanup = bootstrap()
+    })
+    return () => {
+      cancelled = true
+      cancelIdle(idleHandle)
+      cleanup()
+    }
+
+    function bootstrap() {
     const renderer = new Renderer({
       alpha: true,
       premultipliedAlpha: false,
@@ -176,6 +197,8 @@ export default function PortraitMorph({ src, alt, className }) {
     let last = performance.now()
     let time = 0
     let running = true
+    let visible = true
+    let docVisible = document.visibilityState !== 'hidden'
 
     const tick = () => {
       if (!running) return
@@ -199,11 +222,39 @@ export default function PortraitMorph({ src, alt, className }) {
       raf = requestAnimationFrame(tick)
     }
 
+    const startLoop = () => {
+      if (raf) return
+      last = performance.now()
+      raf = requestAnimationFrame(tick)
+    }
+    const stopLoop = () => {
+      if (raf) {
+        cancelAnimationFrame(raf)
+        raf = 0
+      }
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        visible = entries[0]?.isIntersecting ?? true
+        if (visible && docVisible) startLoop()
+        else stopLoop()
+      },
+      { rootMargin: '100px' }
+    )
+    io.observe(container)
+
+    const onVis = () => {
+      docVisible = document.visibilityState !== 'hidden'
+      if (visible && docVisible) startLoop()
+      else stopLoop()
+    }
+    document.addEventListener('visibilitychange', onVis)
+
     loadImage(src)
       .then(() => {
         setReady(true)
-        last = performance.now()
-        tick()
+        if (visible && docVisible) startLoop()
       })
       .catch(() => setReady(false))
 
@@ -257,7 +308,9 @@ export default function PortraitMorph({ src, alt, className }) {
 
     return () => {
       running = false
-      cancelAnimationFrame(raf)
+      stopLoop()
+      io.disconnect()
+      document.removeEventListener('visibilitychange', onVis)
       ro.disconnect()
       container.removeEventListener('pointerenter', onPointerEnter)
       container.removeEventListener('pointerleave', onPointerLeave)
@@ -265,6 +318,7 @@ export default function PortraitMorph({ src, alt, className }) {
       const ext = gl.getExtension('WEBGL_lose_context')
       if (ext) ext.loseContext()
       if (canvas.parentNode === container) container.removeChild(canvas)
+    }
     }
   }, [src])
 

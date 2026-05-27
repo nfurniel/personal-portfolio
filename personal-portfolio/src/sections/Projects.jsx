@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { motion } from 'motion/react'
 import { LuArrowUpRight, LuGithub, LuExternalLink } from 'react-icons/lu'
 import { FadeIn } from '../lib/motion-primitives'
@@ -62,7 +63,7 @@ const PROJECTS = [
   },
 ]
 
-function ProjectCard({ project, index }) {
+const ProjectCard = memo(function ProjectCard({ project, index }) {
   return (
     <motion.article
       className="proj-card"
@@ -132,7 +133,7 @@ function ProjectCard({ project, index }) {
       </div>
     </motion.article>
   )
-}
+})
 
 export default function Projects({ withHeadline = true }) {
   return (
