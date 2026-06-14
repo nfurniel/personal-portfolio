@@ -142,7 +142,7 @@
 
 .contact__top {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 2rem;
   align-items: start;
 }
@@ -184,6 +184,14 @@
   margin-top: 0.5rem;
 }
 
+.contact__side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  /* Móvil/tablet: contenido centrado en la columna apilada. */
+  align-items: center;
+}
+
 .contact__quick {
   list-style: none;
   margin: 0;
@@ -191,11 +199,25 @@
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
+  width: 100%;
+  max-width: 460px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--foreground-8);
   background: color-mix(in oklab, var(--background) 70%, transparent);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+}
+
+/* Escritorio: el bloque ocupa toda su columna y la figura se ancla abajo. */
+@media (min-width: 860px) {
+  .contact__side {
+    align-items: stretch;
+    height: 100%;
+    align-self: stretch;
+  }
+  .contact__quick {
+    max-width: none;
+  }
 }
 
 .contact__quick-row {

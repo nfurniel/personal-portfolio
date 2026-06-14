@@ -1,0 +1,60 @@
+.contact-figure {
+  position: relative;
+  width: 100%;
+  /* Móvil/tablet: centrada y acotada para que el modelo quede al medio. */
+  align-self: center;
+  max-width: 460px;
+  min-height: clamp(220px, 60vw, 300px);
+  height: clamp(220px, 60vw, 300px);
+  /* No captura interacción: figura puramente decorativa. */
+  pointer-events: none;
+  user-select: none;
+}
+
+.contact-figure__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  /* Halo suave detrás de la figura, coherente con los acentos de la tarjeta. */
+  -webkit-mask-image: radial-gradient(75% 75% at 50% 55%, #000 60%, transparent 100%);
+  mask-image: radial-gradient(75% 75% at 50% 55%, #000 60%, transparent 100%);
+}
+
+/* Loader minimalista mientras descarga el modelo (~12 MB). */
+.contact-figure__loader {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  width: 34px;
+  height: 34px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  border: 2px solid var(--foreground-8, rgba(120, 120, 140, 0.18));
+  border-top-color: var(--accent, #7c3aed);
+  animation: contact-figure-spin 0.9s linear infinite;
+  opacity: 0.7;
+}
+
+@keyframes contact-figure-spin {
+  to {
+    transform: translateX(-50%) rotate(360deg);
+  }
+}
+
+/* Escritorio: ocupa la columna y se ancla abajo a la derecha. */
+@media (min-width: 860px) {
+  .contact-figure {
+    align-self: stretch;
+    max-width: none;
+    margin-top: auto;
+    min-height: clamp(240px, 18vw, 320px);
+    height: clamp(240px, 18vw, 320px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-figure__loader {
+    animation-duration: 1.6s;
+  }
+}

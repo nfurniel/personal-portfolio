@@ -4,6 +4,10 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  assetsInclude: ['**/*.glb'],
+  // Caché de pre-bundle en carpeta nueva: la anterior (.vite) quedó con un
+  // temporal bloqueado por el antivirus y provocaba EBUSY al arrancar.
+  cacheDir: 'node_modules/.vite-cache',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

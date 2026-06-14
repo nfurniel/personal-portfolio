@@ -5,6 +5,7 @@ import { LuArrowRight, LuMapPin, LuClock, LuBriefcase } from 'react-icons/lu'
 import ContactButton from '../components/contact-card/ContactButton'
 import ShinyText from '../components/ShinyText'
 import BorderGlow from '../components/border-glow/BorderGlow'
+import ContactFigure from '../components/contact-figure/ContactFigure'
 import './contact.css'
 
 function useThemeAwareGlow() {
@@ -94,17 +95,20 @@ export default function Contact({ email, linkedin, github }) {
                 </div>
               </div>
 
-              <ul className="contact__quick">
-                {QUICK_INFO.map((q, i) => (
-                  <li key={i} className="contact__quick-row">
-                    <span className="contact__quick-icon" aria-hidden="true">{q.icon}</span>
-                    <span className="contact__quick-text">
-                      <span className="contact__quick-label">{q.label}</span>
-                      <span className="contact__quick-value">{q.value}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <div className="contact__side">
+                <ul className="contact__quick">
+                  {QUICK_INFO.map((q, i) => (
+                    <li key={i} className="contact__quick-row">
+                      <span className="contact__quick-icon" aria-hidden="true">{q.icon}</span>
+                      <span className="contact__quick-text">
+                        <span className="contact__quick-label">{q.label}</span>
+                        <span className="contact__quick-value">{q.value}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <ContactFigure />
+              </div>
             </div>
 
             <div className="contact__footer">
