@@ -1,9 +1,10 @@
-import { LuGraduationCap, LuCodeXml, LuLayoutGrid, LuDatabase, LuPalette, LuZap, LuGitBranch } from 'react-icons/lu'
+import { LuGraduationCap, LuBriefcase, LuCodeXml, LuLayoutGrid, LuDatabase, LuPalette, LuZap, LuGitBranch } from 'react-icons/lu'
 import { portfolioData } from '../components/PortfolioData'
 import PolaroidStrip from '../components/polaroid/PolaroidStrip'
 import Stack from '../components/stack/Stack'
 import { FadeIn } from '../lib/motion-primitives'
 import './about.css'
+import { useI18n } from '../i18n'
 
 const SERVICES = [
   { icon: <LuLayoutGrid />, label: 'Frontend Development', hint: 'React, TypeScript, accesibilidad' },
@@ -15,19 +16,19 @@ const SERVICES = [
 ]
 
 export default function About() {
+  const { t } = useI18n()
   return (
     <section id="about" className="about">
       <div className="container about__container">
         <FadeIn className="about__header">
-          <p className="eyebrow">Sobre mí</p>
-          <h2 className="h-display">Un poco sobre mi historia</h2>
+          <p className="eyebrow">{t.about.eyebrow}</p>
+          <h2 className="h-display">{t.about.title}</h2>
         </FadeIn>
 
         <FadeIn className="about__intro" delay={0.05}>
-          <p>{portfolioData.about.description}</p>
+          <p>{t.about.description}</p>
           <p className="about__intro-secondary">
-            Fuera del código, me gusta cuidar los detalles: cómo se siente una transición, cómo respira una tipografía,
-            cómo un botón comunica sin necesitar palabras. Creo que la calidad está en lo pequeño.
+            {t.about.secondary}
           </p>
         </FadeIn>
 
@@ -38,8 +39,8 @@ export default function About() {
         <div className="about__cols">
           <FadeIn className="about__panel about__panel--services" delay={0.05}>
             <div className="about__panel-head">
-              <h3 className="about__panel-title">Lo que hago</h3>
-              <span className="about__panel-sub">6 áreas en las que trabajo</span>
+              <h3 className="about__panel-title">{t.about.what}</h3>
+              <span className="about__panel-sub">{t.about.areas}</span>
             </div>
             <ul className="about__services">
               {SERVICES.map((s, i) => (
@@ -61,8 +62,30 @@ export default function About() {
 
         <FadeIn className="about__panel" delay={0.05}>
           <div className="about__panel-head">
-            <h3 className="about__panel-title">Educación</h3>
-            <span className="about__panel-sub">Formación y aprendizaje continuo</span>
+            <h3 className="about__panel-title">{t.about.experience}</h3>
+            <span className="about__panel-sub">{t.about.experienceSub}</span>
+          </div>
+          <ul className="about__edu">
+            {t.about.experienceItems.map((exp, i) => (
+              <li key={i} className="about__edu-row">
+                <span className="about__edu-logo" aria-hidden="true">
+                  <LuBriefcase />
+                </span>
+                <div className="about__edu-text">
+                  <p className="about__edu-school">{exp.company}</p>
+                  <p className="about__edu-degree">{exp.role}</p>
+                  <p className="about__edu-desc">{exp.description}</p>
+                </div>
+                <span className="about__edu-period">{exp.period}</span>
+              </li>
+            ))}
+          </ul>
+        </FadeIn>
+
+        <FadeIn className="about__panel" delay={0.08}>
+          <div className="about__panel-head">
+            <h3 className="about__panel-title">{t.about.education}</h3>
+            <span className="about__panel-sub">{t.about.educationSub}</span>
           </div>
           <ul className="about__edu">
             {portfolioData.education.map((edu, i) => (
@@ -75,7 +98,7 @@ export default function About() {
                   <p className="about__edu-degree">{edu.degree}</p>
                   <p className="about__edu-desc">{edu.description}</p>
                 </div>
-                <span className="about__edu-period">2023 — Presente</span>
+                <span className="about__edu-period">{t.about.period}</span>
               </li>
             ))}
           </ul>

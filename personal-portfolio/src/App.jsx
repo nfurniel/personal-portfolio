@@ -7,9 +7,10 @@ import Projects from './sections/Projects'
 import About from './sections/About'
 import Contact from './sections/Contact'
 import ClickSpark from './components/ClickSpark'
-import Preloader from './components/preloader'
+import NamePreloader from './components/name-preloader/NamePreloader'
 import { portfolioData } from './components/PortfolioData'
 import { useLenis } from './lib/useLenis'
+import { I18nProvider, useI18n } from './i18n'
 
 const useMediaQuery = (query) => {
   const [matches, setMatches] = useState(() =>
@@ -62,6 +63,11 @@ function useAppReady(minMs = 700) {
 const PRELOADER_BG = '#0a0a0a'
 
 export default function App() {
+  return <I18nProvider><PortfolioApp /></I18nProvider>
+}
+
+function PortfolioApp() {
+  const { t } = useI18n()
   const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const isMobile = useMediaQuery('(max-width: 768px)')
   const sparkColor = useThemeAwareSparkColor()
@@ -87,7 +93,7 @@ export default function App() {
       </main>
 
       <footer className="site-footer">
-        <p>© {new Date().getFullYear()} Nicolás Furnieles · Construido con React, Three.js y GSAP</p>
+        <p>© {new Date().getFullYear()} Nicolás Furnieles · {t.footer}</p>
       </footer>
     </div>
   )
@@ -101,20 +107,8 @@ export default function App() {
   if (reduceMotion) return withSpark
 
   return (
-    <Preloader
-      loading={!appReady}
-      variant="stairs"
-      position="fixed"
-      bgColor={PRELOADER_BG}
-      loadingText="Nicolás Furnieles"
-      stairCount={10}
-      stairsRevealFrom="center"
-      stairsRevealDirection="up"
-      duration={1500}
-      zIndex={9999}
-      ariaLabel="Cargando portfolio"
-    >
+    <NamePreloader loading={!appReady} name="Nicolás Furnieles" bgColor={PRELOADER_BG}>
       {withSpark}
-    </Preloader>
+    </NamePreloader>
   )
 }

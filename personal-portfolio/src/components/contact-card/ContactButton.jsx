@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { LuCopy, LuCheck } from 'react-icons/lu'
 import './contact-button.css'
+import { useI18n } from '../../i18n'
 
 const EASE = [0.22, 1, 0.36, 1]
 
 export default function ContactButton({ email = 'nicopk2018@gmail.com', variant = 'primary' }) {
+  const { t, translate } = useI18n()
   const [state, setState] = useState('idle') // idle | hover | copied
 
   const copy = async () => {
@@ -26,7 +28,7 @@ export default function ContactButton({ email = 'nicopk2018@gmail.com', variant 
   const onEnter = () => state === 'idle' && setState('hover')
   const onLeave = () => state === 'hover' && setState('idle')
 
-  const ariaLabel = state === 'copied' ? 'Email copiado' : state === 'hover' ? `Copiar ${email}` : 'Mostrar email'
+  const ariaLabel = state === 'copied' ? t.actions.copied : state === 'hover' ? translate(t.actions.copy, { email }) : t.actions.showEmail
 
   return (
     <button
@@ -50,7 +52,7 @@ export default function ContactButton({ email = 'nicopk2018@gmail.com', variant 
               exit={{ opacity: 0, y: -6, filter: 'blur(4px)' }}
               transition={{ duration: 0.2, ease: EASE }}
             >
-              Contactar
+              {t.actions.contact}
             </motion.span>
           )}
           {state === 'hover' && (
@@ -75,7 +77,7 @@ export default function ContactButton({ email = 'nicopk2018@gmail.com', variant 
               exit={{ opacity: 0, y: -6, filter: 'blur(4px)' }}
               transition={{ duration: 0.2, ease: EASE }}
             >
-              Email copiado
+              {t.actions.copied}
               <LuCheck aria-hidden="true" />
             </motion.span>
           )}

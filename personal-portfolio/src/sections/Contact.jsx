@@ -7,6 +7,7 @@ import ShinyText from '../components/ShinyText'
 import BorderGlow from '../components/border-glow/BorderGlow'
 import ContactFigure from '../components/contact-figure/ContactFigure'
 import './contact.css'
+import { useI18n } from '../i18n'
 
 function useThemeAwareGlow() {
   const [theme, setTheme] = useState(() =>
@@ -32,6 +33,7 @@ const QUICK_INFO = [
 ]
 
 export default function Contact({ email, linkedin, github }) {
+  const { t } = useI18n()
   const theme = useThemeAwareGlow()
   const isDark = theme === 'dark'
   const cardBg = isDark ? '#0f0f10' : '#f8f9fc'
@@ -39,6 +41,11 @@ export default function Contact({ email, linkedin, github }) {
   const glowColors = isDark
     ? ['#a78bfa', '#7c3aed', '#22d3ee']
     : ['#3b82f6', '#a78bfa', '#06b6d4']
+  const quickInfo = QUICK_INFO.map((item, index) => ({
+    ...item,
+    label: [t.contact.location, t.contact.hours, t.contact.availability][index],
+    value: [item.value, t.contact.hoursValue, t.contact.availabilityValue][index],
+  }))
 
   return (
     <section id="contact" className="contact">
@@ -71,10 +78,10 @@ export default function Contact({ email, linkedin, github }) {
           <div className="contact__inner">
             <div className="contact__top">
               <div className="contact__copy">
-                <p className="eyebrow">Contacto</p>
+                <p className="eyebrow">{t.contact.eyebrow}</p>
                 <h2 className="h-display contact__title">
                   <ShinyText
-                    text="Cerremos la distancia"
+                    text={t.contact.title}
                     speed={4.5}
                     color="currentColor"
                     shineColor="#ffffff"
@@ -83,21 +90,20 @@ export default function Contact({ email, linkedin, github }) {
                   />
                 </h2>
                 <p className="lede contact__lede">
-                  Disponible para proyectos, colaboraciones y prácticas. Si construyes algo interesante,
-                  me encantaría escuchar de qué va.
+                  {t.contact.lede}
                 </p>
 
                 <div className="contact__ctas">
                   <ContactButton email={(email || '').replace('mailto:', '')} />
                   <a href="#projects" className="btn btn-ghost btn-arrow focus-ring">
-                    Ver proyectos <LuArrowRight aria-hidden="true" />
+                    {t.contact.projects} <LuArrowRight aria-hidden="true" />
                   </a>
                 </div>
               </div>
 
               <div className="contact__side">
                 <ul className="contact__quick">
-                  {QUICK_INFO.map((q, i) => (
+                  {quickInfo.map((q, i) => (
                     <li key={i} className="contact__quick-row">
                       <span className="contact__quick-icon" aria-hidden="true">{q.icon}</span>
                       <span className="contact__quick-text">

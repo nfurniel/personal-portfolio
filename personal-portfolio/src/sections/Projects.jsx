@@ -4,6 +4,7 @@ import { LuArrowUpRight, LuGithub, LuExternalLink } from 'react-icons/lu'
 import { FadeIn } from '../lib/motion-primitives'
 import MetallicPaint from '../components/metallic-paint/MetallicPaint'
 import './projects.css'
+import { useI18n } from '../i18n'
 
 const EASE = [0.22, 1, 0.36, 1]
 
@@ -136,15 +137,16 @@ const ProjectCard = memo(function ProjectCard({ project, index }) {
 })
 
 export default function Projects({ withHeadline = true }) {
+  const { t } = useI18n()
   return (
     <section id="projects" className="projects">
       <div className="container projects__container">
         {withHeadline && (
           <FadeIn className="projects__header">
-            <p className="eyebrow">Trabajo seleccionado</p>
-            <h2 className="h-display">Proyectos recientes</h2>
+            <p className="eyebrow">{t.projects.eyebrow}</p>
+            <h2 className="h-display">{t.projects.title}</h2>
             <p className="lede">
-              Una selección de proyectos académicos y personales. Click en cualquier card para abrir la demo en vivo.
+              {t.projects.lede}
             </p>
           </FadeIn>
         )}

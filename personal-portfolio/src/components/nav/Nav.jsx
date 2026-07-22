@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'motion/react'
+import { motion as Motion } from 'motion/react'
 import { LuSun, LuMoon } from 'react-icons/lu'
 import './nav.css'
+import { useI18n } from '../../i18n'
+import LanguageSwitcher from './LanguageSwitcher'
 
-const LINKS = [
-  { id: 'home', label: 'Home' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'about', label: 'About' },
-]
+const LINKS = ['home', 'projects', 'about']
 
 function getInitialTheme() {
   if (typeof window === 'undefined') return 'light'
@@ -25,6 +23,7 @@ function applyTheme(theme) {
 }
 
 export default function Nav() {
+  const { language, t, translate } = useI18n()
   const [active, setActive] = useState('home')
   const [theme, setTheme] = useState(getInitialTheme)
   const itemRefs = useRef({})
@@ -38,11 +37,11 @@ export default function Nav() {
   useEffect(() => {
     const onScroll = () => {
       let current = 'home'
-      for (const link of LINKS) {
-        const el = document.getElementById(link.id)
+      for (const id of LINKS) {
+        const el = document.getElementById(id)
         if (!el) continue
         const top = el.getBoundingClientRect().top
-        if (top < window.innerHeight * 0.4) current = link.id
+        if (top < window.innerHeight * 0.4) current = id
       }
       setActive(current)
     }
@@ -58,7 +57,7 @@ export default function Nav() {
     const pRect = parent.getBoundingClientRect()
     const r = el.getBoundingClientRect()
     setIndicator({ left: r.left - pRect.left, width: r.width })
-  }, [active])
+  }, [active, language])
 
   const toggleTheme = (e) => {
     const next = theme === 'dark' ? 'light' : 'dark'
@@ -100,20 +99,20 @@ export default function Nav() {
   return (
     <nav className="nav-wrap" aria-label="Primary">
       <div className="nav-pill" role="navigation">
-        <motion.span
+        <Motion.span
           className="nav-indicator"
           animate={{ left: indicator.left, width: indicator.width }}
           transition={{ type: 'spring', stiffness: 360, damping: 32 }}
         />
-        {LINKS.map((l) => (
+        {LINKS.map((id) => (
           <a
-            key={l.id}
-            ref={(el) => (itemRefs.current[l.id] = el)}
-            href={`#${l.id}`}
-            className={`nav-link focus-ring ${active === l.id ? 'is-active' : ''}`}
-            aria-current={active === l.id ? 'page' : undefined}
+            key={id}
+            ref={(el) => (itemRefs.current[id] = el)}
+            href={`#${id}`}
+            className={`nav-link focus-ring ${active === id ? 'is-active' : ''}`}
+            aria-current={active === id ? 'page' : undefined}
           >
-            {l.label}
+            {t.nav[id]}
           </a>
         ))}
       </div>
@@ -123,11 +122,12 @@ export default function Nav() {
         type="button"
         className="nav-theme focus-ring"
         onClick={toggleTheme}
-        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+        aria-label={translate(t.nav.theme, { theme: theme === 'dark' ? 'light' : 'dark' })}
         aria-pressed={theme === 'dark'}
       >
         {theme === 'dark' ? <LuSun aria-hidden="true" /> : <LuMoon aria-hidden="true" />}
       </button>
+      <LanguageSwitcher />
     </nav>
   )
 }
