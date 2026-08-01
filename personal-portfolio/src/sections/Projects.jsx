@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { motion } from 'motion/react'
+import { motion as Motion } from 'motion/react'
 import { LuArrowUpRight, LuGithub, LuExternalLink } from 'react-icons/lu'
 import { FadeIn } from '../lib/motion-primitives'
 import MetallicPaint from '../components/metallic-paint/MetallicPaint'
@@ -50,23 +50,22 @@ const PROJECTS = [
     demo: 'https://proyecto-ev-chargers.vercel.app',
   },
   {
-    id: 'eat-and-rest',
-    title: 'Eat & Rest',
-    tag: 'Personal · 2025',
-    description: 'Web ligera para descubrir restaurantes y zonas de descanso. Front en JavaScript con foco en UX simple.',
-    accent: '#f7df1e',
+    id: 'casas-madera-vip',
+    title: 'Casas Madera VIP',
+    tag: 'Comercial · 2026',
+    description: 'Web comercial para un cliente real: restauración de casas de madera, con una UX interactiva moderna y transiciones fluidas.',
+    accent: '#4f7cff',
     accentText: '#ffffff',
-    iconSrc: '/icons/javascript.svg',
-    iconTint: '#fff3a0',
-    techs: ['JavaScript', 'React'],
-    github: 'https://github.com/nfurniel/eat-and-rest',
-    demo: 'https://eat-and-rest.vercel.app',
+    iconSrc: '/icons/react.svg',
+    iconTint: '#b3c8ff',
+    techs: ['React', 'GSAP', 'Vite'],
+    demo: 'https://casasmaderavip.es/',
   },
 ]
 
 const ProjectCard = memo(function ProjectCard({ project, index }) {
   return (
-    <motion.article
+    <Motion.article
       className="proj-card"
       initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
       whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -132,7 +131,7 @@ const ProjectCard = memo(function ProjectCard({ project, index }) {
           </div>
         </div>
       </div>
-    </motion.article>
+    </Motion.article>
   )
 })
 
