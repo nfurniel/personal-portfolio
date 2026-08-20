@@ -35,19 +35,33 @@ export default function Nav() {
   }, [])
 
   useEffect(() => {
-    const onScroll = () => {
+    let frame = null
+
+    // Lenis drives scroll every frame, so measuring straight from the listener
+    // meant a forced layout per section on each event. Coalescing into one rAF
+    // keeps it to a single batched read per frame.
+    const measure = () => {
+      frame = null
+      const threshold = window.innerHeight * 0.4
       let current = 'home'
       for (const id of LINKS) {
         const el = document.getElementById(id)
         if (!el) continue
-        const top = el.getBoundingClientRect().top
-        if (top < window.innerHeight * 0.4) current = id
+        if (el.getBoundingClientRect().top < threshold) current = id
       }
       setActive(current)
     }
+
+    const onScroll = () => {
+      if (frame === null) frame = requestAnimationFrame(measure)
+    }
+
     window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
+    measure()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (frame !== null) cancelAnimationFrame(frame)
+    }
   }, [])
 
   useEffect(() => {

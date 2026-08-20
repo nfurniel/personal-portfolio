@@ -1,0 +1,81 @@
+/*
+ * Award Components p050 "Awesome Preloader", adapted to the site's theme tokens.
+ *
+ * The overlay runs inverted against the active theme — dark surface on the light
+ * theme, light surface on the dark one — so the curve sweeping away reads at full
+ * contrast against the page behind it.
+ */
+.hp-overlay {
+  --hp-bg: var(--foreground, #0a0a0a);
+  --hp-fg: var(--background, #ffffff);
+
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--hp-bg);
+  will-change: transform;
+  contain: layout style paint;
+}
+
+.hp-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100% + 300px);
+  pointer-events: none;
+}
+
+.hp-svg__fill {
+  fill: var(--hp-bg);
+}
+
+.hp-word {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--hp-fg);
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
+  font-size: 42px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  opacity: 0;
+  will-change: opacity;
+}
+
+.hp-dot {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--hp-fg);
+  flex: 0 0 auto;
+}
+
+/* Keeps the glyph swap from nudging the dot as words change width. */
+.hp-word__text {
+  display: block;
+  white-space: nowrap;
+}
+
+.hp-content {
+  transform-origin: 50% 40%;
+}
+
+@media (max-width: 767px) {
+  .hp-word {
+    font-size: 30px;
+  }
+
+  .hp-dot {
+    width: 8px;
+    height: 8px;
+  }
+}

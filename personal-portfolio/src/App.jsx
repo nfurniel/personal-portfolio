@@ -7,7 +7,7 @@ import Projects from './sections/Projects'
 import About from './sections/About'
 import Contact from './sections/Contact'
 import ClickSpark from './components/ClickSpark'
-import NamePreloader from './components/name-preloader/NamePreloader'
+import HelloPreloader from './components/hello-preloader/HelloPreloader'
 import { portfolioData } from './components/PortfolioData'
 import { useLenis } from './lib/useLenis'
 import { I18nProvider, useI18n } from './i18n'
@@ -60,8 +60,6 @@ function useAppReady(minMs = 700) {
   return ready
 }
 
-const PRELOADER_BG = '#0a0a0a'
-
 export default function App() {
   return <I18nProvider><PortfolioApp /></I18nProvider>
 }
@@ -71,7 +69,9 @@ function PortfolioApp() {
   const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const isMobile = useMediaQuery('(max-width: 768px)')
   const sparkColor = useThemeAwareSparkColor()
-  const appReady = useAppReady(1200)
+  // The greeting cycle already sets the visual floor (~2.9s); this only has to
+  // report when the page has actually finished loading.
+  const appReady = useAppReady(0)
   useLenis({ enabled: !reduceMotion })
 
   const cleanEmail = portfolioData.header.social.email.replace('mailto:', '')
@@ -106,9 +106,5 @@ function PortfolioApp() {
 
   if (reduceMotion) return withSpark
 
-  return (
-    <NamePreloader loading={!appReady} name="Nicolás Furnieles" bgColor={PRELOADER_BG}>
-      {withSpark}
-    </NamePreloader>
-  )
+  return <HelloPreloader loading={!appReady}>{withSpark}</HelloPreloader>
 }

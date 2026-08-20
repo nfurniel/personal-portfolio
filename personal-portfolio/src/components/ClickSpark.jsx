@@ -12,7 +12,8 @@ const ClickSpark = ({
 }) => {
   const canvasRef = useRef(null);
   const sparksRef = useRef([]);
-  const startTimeRef = useRef(null);
+  const rafRef = useRef(null);
+  const startLoopRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -63,17 +64,18 @@ const ClickSpark = ({
     [easing]
   );
 
+  /*
+   * The loop only runs while sparks are alive. This canvas wraps the entire
+   * site, so a permanently scheduled frame meant clearing a full-viewport
+   * canvas 60 times a second for the whole session even though it is idle
+   * almost all of that time.
+   */
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    let animationId;
-
     const draw = timestamp => {
-      if (!startTimeRef.current) {
-        startTimeRef.current = timestamp;
-      }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       sparksRef.current = sparksRef.current.filter(spark => {
@@ -103,15 +105,29 @@ const ClickSpark = ({
         return true;
       });
 
-      animationId = requestAnimationFrame(draw);
+      // The frame that empties the list already cleared the canvas above, so
+      // parking the loop here leaves nothing stale on screen.
+      rafRef.current = sparksRef.current.length ? requestAnimationFrame(draw) : null;
     };
 
-    animationId = requestAnimationFrame(draw);
+    startLoopRef.current = () => {
+      if (rafRef.current === null) {
+        rafRef.current = requestAnimationFrame(draw);
+      }
+    };
+
+    // Sparks may already be in flight when a prop such as the theme colour
+    // changes and re-creates this effect.
+    if (sparksRef.current.length) startLoopRef.current();
 
     return () => {
-      cancelAnimationFrame(animationId);
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      startLoopRef.current = null;
     };
-  }, [sparkColor, sparkSize, sparkRadius, sparkCount, duration, easeFunc, extraScale]);
+  }, [sparkColor, sparkSize, sparkRadius, duration, easeFunc, extraScale]);
 
   const handleClick = e => {
     const canvas = canvasRef.current;
@@ -129,6 +145,7 @@ const ClickSpark = ({
     }));
 
     sparksRef.current.push(...newSparks);
+    startLoopRef.current?.();
   };
 
   return (

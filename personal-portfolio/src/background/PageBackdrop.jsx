@@ -54,27 +54,38 @@ export default function PageBackdrop({ reduceMotion = false }) {
   // wave reacts even when the mouse is over interactive content above.
   useEffect(() => {
     if (reduceMotion) return
-    let dispatching = false
-    const onMove = (e) => {
-      if (dispatching) return
+
+    // Pointer events can outpace the display, and the wave only ever renders
+    // once per frame. Forwarding just the latest position per frame drops the
+    // redundant synthetic events (and the querySelector each one triggered).
+    let frame = null
+    let lastX = 0
+    let lastY = 0
+
+    const forward = () => {
+      frame = null
       const root = wrapRef.current?.querySelector('.cursor-wave-root')
       if (!root) return
-      dispatching = true
-      try {
-        const synth = new PointerEvent('pointermove', {
+      root.dispatchEvent(
+        new PointerEvent('pointermove', {
           bubbles: true,
-          clientX: e.clientX,
-          clientY: e.clientY,
+          clientX: lastX,
+          clientY: lastY,
           pointerType: 'mouse',
-        })
-        root.dispatchEvent(synth)
-      } finally {
-        dispatching = false
-      }
+        }),
+      )
     }
+
+    const onMove = (e) => {
+      lastX = e.clientX
+      lastY = e.clientY
+      if (frame === null) frame = requestAnimationFrame(forward)
+    }
+
     window.addEventListener('pointermove', onMove, { passive: true })
     return () => {
       window.removeEventListener('pointermove', onMove)
+      if (frame !== null) cancelAnimationFrame(frame)
     }
   }, [reduceMotion])
 
