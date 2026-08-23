@@ -32,11 +32,15 @@ function ChipPill({ chip, innerRef }) {
       }}
     >
       <span className="stack-chip__icon" aria-hidden="true">
+        {/* Deferred on purpose: these come from a third-party CDN, and eager
+            <img> requests delay the window load event the preloader waits on. */}
         <img
           src={`https://cdn.simpleicons.org/${chip.slug}`}
           alt=""
           width={18}
           height={18}
+          loading="lazy"
+          decoding="async"
           draggable={false}
         />
       </span>

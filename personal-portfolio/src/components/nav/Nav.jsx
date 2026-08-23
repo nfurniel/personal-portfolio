@@ -129,18 +129,21 @@ export default function Nav() {
             {t.nav[id]}
           </a>
         ))}
+
+        <span className="nav-sep" aria-hidden="true" />
+
+        <button
+          ref={themeBtnRef}
+          type="button"
+          className="nav-theme focus-ring"
+          onClick={toggleTheme}
+          aria-label={translate(t.nav.theme, { theme: theme === 'dark' ? 'light' : 'dark' })}
+          aria-pressed={theme === 'dark'}
+        >
+          {theme === 'dark' ? <LuSun aria-hidden="true" /> : <LuMoon aria-hidden="true" />}
+        </button>
       </div>
 
-      <button
-        ref={themeBtnRef}
-        type="button"
-        className="nav-theme focus-ring"
-        onClick={toggleTheme}
-        aria-label={translate(t.nav.theme, { theme: theme === 'dark' ? 'light' : 'dark' })}
-        aria-pressed={theme === 'dark'}
-      >
-        {theme === 'dark' ? <LuSun aria-hidden="true" /> : <LuMoon aria-hidden="true" />}
-      </button>
       <LanguageSwitcher />
     </nav>
   )

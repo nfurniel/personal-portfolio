@@ -41,22 +41,40 @@ function useThemeAwareSparkColor() {
   return color
 }
 
-function useAppReady(minMs = 700) {
+/*
+ * The load event waits on every subresource, third-party ones included. If any
+ * of those hang — a blocked CDN, a stalled font — it never fires at all, and a
+ * preloader gated on it would trap the page behind it forever. So the wait is
+ * capped: past maxMs the app reports ready regardless.
+ */
+function useAppReady(minMs = 700, maxMs = 4000) {
   const [ready, setReady] = useState(false)
   useEffect(() => {
     const start = performance.now()
+    let settleTimer = null
+
     const finish = () => {
-      const elapsed = performance.now() - start
-      const wait = Math.max(0, minMs - elapsed)
-      setTimeout(() => setReady(true), wait)
+      const wait = Math.max(0, minMs - (performance.now() - start))
+      settleTimer = setTimeout(() => setReady(true), wait)
     }
+
+    const capTimer = setTimeout(() => {
+      window.removeEventListener('load', finish)
+      setReady(true)
+    }, maxMs)
+
     if (document.readyState === 'complete') {
       finish()
     } else {
       window.addEventListener('load', finish, { once: true })
-      return () => window.removeEventListener('load', finish)
     }
-  }, [minMs])
+
+    return () => {
+      window.removeEventListener('load', finish)
+      clearTimeout(capTimer)
+      if (settleTimer) clearTimeout(settleTimer)
+    }
+  }, [minMs, maxMs])
   return ready
 }
 
