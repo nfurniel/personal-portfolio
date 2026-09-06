@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Fraunces:opsz,wght@9..144,300..900&display=swap');
+/* Las fuentes se piden desde index.html, en un único <link> con preconnect.
+   Aquí vivía un @import de las tres familias, que el navegador solo podía
+   descubrir DESPUÉS de descargar y parsear esta hoja: una segunda petición
+   bloqueante encadenada a la primera, en plena ruta crítica. */
 
 :root {
   /* light theme tokens (mirror rbp-portfolio) */
