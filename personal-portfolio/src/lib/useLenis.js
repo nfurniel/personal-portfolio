@@ -1,9 +1,5 @@
 import { useEffect } from 'react'
 import Lenis from 'lenis'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 
 let lenisInstance = null
 
@@ -22,16 +18,13 @@ export function useLenis({ enabled = true } = {}) {
       smoothTouch: false,
       wheelMultiplier: 1,
       touchMultiplier: 1.2,
+      // Lenis drives its own frame loop. This used to be pumped from
+      // gsap.ticker, which only existed so ScrollTrigger could stay in sync —
+      // and nothing in the site ever created a ScrollTrigger, so the plugin was
+      // ~43 kB of startup JS doing nothing.
+      autoRaf: true,
     })
     lenisInstance = lenis
-
-    lenis.on('scroll', ScrollTrigger.update)
-
-    const onRaf = (time) => {
-      lenis.raf(time * 1000)
-    }
-    gsap.ticker.add(onRaf)
-    gsap.ticker.lagSmoothing(0)
 
     // Anchor link integration
     const onAnchorClick = (e) => {
@@ -48,7 +41,6 @@ export function useLenis({ enabled = true } = {}) {
 
     return () => {
       document.removeEventListener('click', onAnchorClick)
-      gsap.ticker.remove(onRaf)
       lenis.destroy()
       lenisInstance = null
     }
