@@ -63,7 +63,24 @@ export default function Stack() {
     let cancelled = false
     let cleanup
 
-    ;(async () => {
+    /*
+     * Nada de esto arranca hasta que la sección se acerca al viewport: ni la
+     * descarga del chunk de matter-js (~85 kB), que antes competía con la carga
+     * inicial, ni la simulación, que se quedaba corriendo el resto de la sesión
+     * aunque el panel llevara rato fuera de pantalla. Como efecto secundario las
+     * fichas ahora caen cuando el usuario llega, no antes de que mire.
+     */
+    const armIo = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        armIo.disconnect()
+        boot()
+      },
+      { rootMargin: '200px' }
+    )
+    armIo.observe(container)
+
+    async function boot() {
       const Matter = await import('matter-js')
       if (cancelled) return
       const { Engine, Runner, World, Bodies, Body, Mouse, MouseConstraint, Events } = Matter
@@ -123,7 +140,6 @@ export default function Stack() {
       Events.on(mouseConstraint, 'enddrag', () => { container.style.cursor = 'grab' })
 
       const runner = Runner.create()
-      Runner.run(runner, engine)
 
       let raf = 0
       const tick = () => {
@@ -136,7 +152,46 @@ export default function Stack() {
         }
         raf = requestAnimationFrame(tick)
       }
-      raf = requestAnimationFrame(tick)
+
+      // Fuera de pantalla o en una pestaña de fondo, ni el solver ni el bucle
+      // que escribe los transforms tienen a quién servir.
+      let running = false
+      let visible = true
+      let docVisible = document.visibilityState !== 'hidden'
+
+      const startSim = () => {
+        if (running) return
+        running = true
+        Runner.run(runner, engine)
+        raf = requestAnimationFrame(tick)
+      }
+      const stopSim = () => {
+        if (!running) return
+        running = false
+        Runner.stop(runner)
+        if (raf) {
+          cancelAnimationFrame(raf)
+          raf = 0
+        }
+      }
+      const sync = () => (visible && docVisible ? startSim() : stopSim())
+
+      const visIo = new IntersectionObserver(
+        ([entry]) => {
+          visible = entry.isIntersecting
+          sync()
+        },
+        { rootMargin: '200px' }
+      )
+      visIo.observe(container)
+
+      const onVis = () => {
+        docVisible = document.visibilityState !== 'hidden'
+        sync()
+      }
+      document.addEventListener('visibilitychange', onVis)
+
+      startSim()
 
       const onResize = () => {
         const nw = container.clientWidth
@@ -152,16 +207,18 @@ export default function Stack() {
       ro.observe(container)
 
       cleanup = () => {
-        cancelAnimationFrame(raf)
+        stopSim()
+        visIo.disconnect()
+        document.removeEventListener('visibilitychange', onVis)
         ro.disconnect()
-        Runner.stop(runner)
         World.clear(world, false)
         Engine.clear(engine)
       }
-    })()
+    }
 
     return () => {
       cancelled = true
+      armIo.disconnect()
       cleanup?.()
     }
   }, [resetKey])

@@ -142,9 +142,24 @@ void main(){
   oC=vec4(col*vs,vs);
 }`;
 
+/*
+ * The relaxation in processImage is O(iterations × pixels). It used to solve a
+ * 500×500 grid for 200 iterations — 50M inner steps, synchronously on the main
+ * thread, once per card — which alone accounted for most of the page's blocking
+ * time. Solving on a smaller grid and scaling the iteration count with it keeps
+ * the same convergence ratio, so the bevel reads the same, for ~1/18th of the
+ * work. The output is a smooth depth field the GPU samples with LINEAR
+ * filtering, so the coarser grid never shows.
+ */
+const FIELD_SIZE = 192;
+const FIELD_ITERATIONS = Math.round(200 * (FIELD_SIZE / 500));
+
+// Two cards share /icons/react.svg. Keyed by source, the field is solved once.
+const fieldCache = new Map();
+
 function processImage(img) {
-  const MAX_SIZE = 1000;
-  const MIN_SIZE = 500;
+  const MAX_SIZE = FIELD_SIZE;
+  const MIN_SIZE = FIELD_SIZE;
   let width = img.naturalWidth || img.width;
   let height = img.naturalHeight || img.height;
 
@@ -209,7 +224,7 @@ function processImage(img) {
   }
 
   const u = new Float32Array(size);
-  const ITERATIONS = 200;
+  const ITERATIONS = FIELD_ITERATIONS;
   const C = 0.01;
   const omega = 1.85;
 
@@ -289,8 +304,29 @@ export default function MetallicPaint({
   const mouseRef = useRef({ x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5 });
   const mouseAnimRef = useRef(mouseAnimation);
 
+  const [armed, setArmed] = useState(false);
   const [ready, setReady] = useState(false);
   const [textureReady, setTextureReady] = useState(false);
+
+  // Nothing happens until the card is near the viewport: no WebGL context, no
+  // shader compile, no depth-field solve. The grid sits well below the fold, so
+  // initialising all four eagerly meant four contexts and four relaxation
+  // passes competing with the first paint.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const io = new IntersectionObserver(
+      entries => {
+        if (entries[0]?.isIntersecting) {
+          setArmed(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+    io.observe(canvas);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     speedRef.current = speed;
@@ -383,6 +419,7 @@ export default function MetallicPaint({
     // Defer GL init off the main critical path so the preloader can paint smoothly.
     // Shader compilation across 4 simultaneous canvases would otherwise stall the
     // first paint by 50-200 ms.
+    if (!armed) return;
     let mounted = true;
     const idle = (cb) =>
       typeof requestIdleCallback === 'function'
@@ -413,20 +450,33 @@ export default function MetallicPaint({
         glRef.current.deleteTexture(textureRef.current);
       }
     };
-  }, [initGL, size]);
+  }, [armed, initGL, size]);
 
   useEffect(() => {
     if (!ready || !imageSrc) return;
 
+    const cached = fieldCache.get(imageSrc);
+    if (cached) {
+      uploadTexture(cached);
+      setTextureReady(true);
+      return;
+    }
+
+    let cancelled = false;
     setTextureReady(false);
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
+      if (cancelled) return;
       const imgData = processImage(img);
+      fieldCache.set(imageSrc, imgData);
       uploadTexture(imgData);
       setTextureReady(true);
     };
     img.src = imageSrc;
+    return () => {
+      cancelled = true;
+    };
   }, [ready, imageSrc, uploadTexture]);
 
   useEffect(() => {

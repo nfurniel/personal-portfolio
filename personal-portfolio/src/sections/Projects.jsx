@@ -84,7 +84,10 @@ const ProjectCard = memo(function ProjectCard({ project, index }) {
           <MetallicPaint
             imageSrc={project.iconSrc}
             tintColor={project.iconTint}
-            size={420}
+            // El canvas se pinta como mucho a 220 px CSS (ver projects.css), así
+            // que 240 × dpr ya lo cubre en retina. Estaba en 420, que a dpr 2
+            // son 840² fragmentos de un shader pesado para mostrar 220.
+            size={240}
             scale={3.2}
             speed={0.22}
             liquid={0.6}

@@ -141,12 +141,23 @@ function tracePath(
   }
 }
 
+/*
+ * Canvas gradients are defined in user space and transformed by the CTM at
+ * paint time, so one gradient object per (colour, size) can be reused by every
+ * cell that draws it under its own translate/rotate/scale. Building them inline
+ * meant allocating a CanvasGradient per gradient-coloured cell per frame —
+ * several hundred throwaway objects a frame, all identical.
+ */
 function makeFill(
   ctx: CanvasRenderingContext2D,
   color: CursorWaveColor,
   size: number,
+  cache: Map<string, CanvasGradient>,
 ): string | CanvasGradient {
   if (typeof color === "string") return color;
+  const key = `${color.stops[0]}|${color.stops[1]}|${size}`;
+  const hit = cache.get(key);
+  if (hit) return hit;
   const grad = ctx.createRadialGradient(
     0,
     -size * 0.3,
@@ -157,6 +168,7 @@ function makeFill(
   );
   grad.addColorStop(0, color.stops[0]);
   grad.addColorStop(1, color.stops[1]);
+  cache.set(key, grad);
   return grad;
 }
 
@@ -223,6 +235,9 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
       height: number;
       dpr: number;
       raf: number;
+      /** Whether anything on screen can still change; see the tick below. */
+      dirty: boolean;
+      gradients: Map<string, CanvasGradient>;
     };
     const runtimeRef = useRef<Runtime | null>(null);
     if (runtimeRef.current === null) {
@@ -239,6 +254,8 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
         height: 0,
         dpr: 1,
         raf: 0,
+        dirty: true,
+        gradients: new Map(),
       };
     }
 
@@ -258,6 +275,10 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
       opacity,
     });
     useEffect(() => {
+      // The loop parks itself when the picture is static, so a prop that
+      // changes how it looks — the theme flipping backgroundColor and opacity,
+      // above all — has to ask for one more frame.
+      if (runtimeRef.current) runtimeRef.current.dirty = true;
       propsRef.current = {
         cellSize,
         influenceRadiusVmin,
@@ -321,6 +342,9 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
         }
       }
       rt.cells = cells;
+      // Cell size may have changed, and the cached gradients are sized to it.
+      rt.gradients.clear();
+      rt.dirty = true;
     }, []);
 
     const resize = useCallback(() => {
@@ -348,6 +372,8 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
       rt.width = w;
       rt.height = h;
       rt.dpr = ratio;
+      // A resized canvas is cleared by the browser, so the parked picture is
+      // gone and has to be redrawn; buildLattice sets dirty.
       buildLattice();
     }, [buildLattice, dpr]);
 
@@ -368,6 +394,7 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
       }
 
       rt.ripples.push({ x: lx, y: ly, start: performance.now() });
+      rt.dirty = true;
 
       const diag = Math.sqrt(rt.width * rt.width + rt.height * rt.height);
       const lifeMs = (diag / Math.max(propsRef.current.burstSpeed, 1)) * 1000;
@@ -385,7 +412,22 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
 
       resize();
 
+      /*
+       * This canvas covers the whole viewport and holds ~1000 cells. At rest
+       * every one of them sits at idleScale and the picture is identical frame
+       * to frame, so repainting it was burning a full-screen clear plus a
+       * thousand save/transform/fill cycles, 60 times a second, for the entire
+       * session. The frame is now skipped outright unless something can still
+       * change: pointer energy, a live ripple, a cell still easing, or mask
+       * rectangles that could have moved. What is already on the canvas stays
+       * on it, so parking is invisible.
+       */
       const tick = () => {
+        if (!rt.dirty) {
+          rt.raf = requestAnimationFrame(tick);
+          return;
+        }
+
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext("2d");
@@ -442,6 +484,9 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
 
         ctx.globalAlpha = p.opacity;
 
+        // Cleared by any cell still easing towards its target this frame.
+        let settled = true;
+
         for (let i = 0; i < rt.cells.length; i++) {
           const cell = rt.cells[i];
 
@@ -462,7 +507,9 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
           }
 
           if (masked) {
-            cell.scale += (0 - cell.scale) * releaseF;
+            const step = (0 - cell.scale) * releaseF;
+            if (Math.abs(step) > 1e-4) settled = false;
+            cell.scale += step;
             if (cell.scale < 0.005) cell.scale = 0;
             continue;
           }
@@ -507,7 +554,9 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
             pointerTarget > waveTarget ? pointerTarget : waveTarget;
 
           const f = target > cell.scale ? attackF : releaseF;
-          cell.scale += (target - cell.scale) * f;
+          const step = (target - cell.scale) * f;
+          if (Math.abs(step) > 1e-4) settled = false;
+          cell.scale += step;
 
           if (cell.scale < p.idleScale * 0.15) continue;
 
@@ -515,13 +564,21 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
           ctx.translate(cell.x, cell.y);
           ctx.rotate(cell.angle);
           ctx.scale(cell.scale, cell.scale);
-          ctx.fillStyle = makeFill(ctx, cell.color, cell.size);
+          ctx.fillStyle = makeFill(ctx, cell.color, cell.size, rt.gradients);
           tracePath(ctx, cell.shape, cell.size);
           ctx.fill();
           ctx.restore();
         }
 
         ctx.globalAlpha = 1;
+
+        // Mask rectangles are read from live DOM geometry, so while any exist
+        // the loop has to keep running to notice them moving.
+        rt.dirty =
+          !settled ||
+          rt.pointerEnergy > 0.001 ||
+          rt.ripples.length > 0 ||
+          rt.maskRects.length > 0;
 
         rt.raf = requestAnimationFrame(tick);
       };
@@ -544,8 +601,14 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
       };
     }, [resize]);
 
+    // Keyed on the palette itself, not just its length: light and dark ship the
+    // same number of colours, so the old key never changed on a theme flip and
+    // the cells kept painting themselves from the outgoing palette.
     const structuralKey = useMemo(
-      () => `${cellSize}|${shapes.join(",")}|${colors.length}`,
+      () =>
+        `${cellSize}|${shapes.join(",")}|${colors
+          .map((c) => (typeof c === "string" ? c : c.stops.join(">")))
+          .join(",")}`,
       [cellSize, shapes, colors],
     );
     useEffect(() => {
@@ -563,6 +626,7 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
           y: e.clientY - rect.top,
         };
         rt.pointerEnergy = 1;
+        rt.dirty = true;
       },
       [],
     );
@@ -571,6 +635,7 @@ const CursorWave = React.forwardRef<CursorWaveHandle, CursorWaveProps>(
       const rt = runtimeRef.current;
       if (!rt) return;
       rt.pointer = null;
+      rt.dirty = true;
     }, []);
 
     const onPointerDown = useCallback(
