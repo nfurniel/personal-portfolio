@@ -124,5 +124,19 @@ function PortfolioApp() {
 
   if (reduceMotion) return withSpark
 
-  return <HelloPreloader loading={!appReady}>{withSpark}</HelloPreloader>
+  // The intro is what the Speed Index is actually measuring: nothing else can
+  // paint until it lifts, so every tenth of a second it holds costs score.
+  // These three set the length of the whole gesture — the first greeting holds,
+  // the rest cycle, then the surface waits before sweeping away. Roughly three
+  // seconds of greeting plus a 1.45s sweep. Lower them to speed the intro up.
+  return (
+    <HelloPreloader
+      loading={!appReady}
+      firstWordHold={0.8}
+      wordInterval={0.2}
+      tailHold={0.85}
+    >
+      {withSpark}
+    </HelloPreloader>
+  )
 }

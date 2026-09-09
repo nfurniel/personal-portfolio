@@ -93,8 +93,11 @@ export default function HelloPreloader({
     }
     cycleWords()
 
-    const totalDelay = words.length * wordInterval + tailHold
-    calls.push(gsap.delayedCall(totalDelay, () => setSequenceDone(true)))
+    // Measured from the last greeting instead of from a bare word count, so a
+    // longer firstWordHold or wordInterval can never let the exit start while
+    // the cycle is still swapping words.
+    const cycleDuration = firstWordHold + Math.max(words.length - 2, 0) * wordInterval
+    calls.push(gsap.delayedCall(cycleDuration + tailHold, () => setSequenceDone(true)))
 
     window.addEventListener('resize', syncPaths)
 
@@ -129,12 +132,12 @@ export default function HelloPreloader({
       },
     })
 
-    tl.to(wordEl, { opacity: 0, duration: 0.3 }, 0)
-    tl.to(overlay, { y: '-100vh', duration: 0.8, delay: 0.2, ease: 'power4.inOut' }, 0)
+    tl.to(wordEl, { opacity: 0, duration: 0.45 }, 0)
+    tl.to(overlay, { y: '-100vh', duration: 1.1, delay: 0.35, ease: 'power4.inOut' }, 0)
     tl.fromTo(
       fillRef.current,
       { attr: { d: initial } },
-      { attr: { d: target }, duration: 0.7, delay: 0.3, ease: 'power4.inOut' },
+      { attr: { d: target }, duration: 0.95, delay: 0.45, ease: 'power4.inOut' },
       0,
     )
 
