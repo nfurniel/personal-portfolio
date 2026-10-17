@@ -139,18 +139,6 @@
   color: var(--muted-foreground);
 }
 
-.proj-card__stars {
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--muted-foreground);
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--muted);
-}
-
 .proj-card__title {
   font-family: var(--font-sans);
   font-size: clamp(1.1rem, 1.7vw, 1.3rem);

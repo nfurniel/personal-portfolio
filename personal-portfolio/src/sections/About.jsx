@@ -1,19 +1,12 @@
-import { LuGraduationCap, LuBriefcase, LuCodeXml, LuLayoutGrid, LuDatabase, LuPalette, LuZap, LuGitBranch } from 'react-icons/lu'
-import { portfolioData } from '../components/PortfolioData'
+import { LuGraduationCap, LuBriefcase, LuCodeXml, LuLayoutGrid, LuDatabase, LuSparkles, LuWorkflow, LuZap } from 'react-icons/lu'
 import PolaroidStrip from '../components/polaroid/PolaroidStrip'
 import Stack from '../components/stack/Stack'
 import { FadeIn } from '../lib/motion-primitives'
 import './about.css'
 import { useI18n } from '../i18n'
 
-const SERVICES = [
-  { icon: <LuLayoutGrid />, label: 'Frontend Development', hint: 'React, TypeScript, accesibilidad' },
-  { icon: <LuCodeXml />, label: 'Full Stack', hint: 'API REST, Laravel, Node.js' },
-  { icon: <LuDatabase />, label: 'Bases de datos', hint: 'MySQL, MongoDB, modelado' },
-  { icon: <LuPalette />, label: 'Diseño Responsive', hint: 'Mobile-first, fluid layouts' },
-  { icon: <LuZap />, label: 'Performance', hint: 'Core Web Vitals, bundles ligeros' },
-  { icon: <LuGitBranch />, label: 'Git & Workflow', hint: 'Branches, PRs, CI básico' },
-]
+// Labels and hints live in i18n (t.about.services), matched by index.
+const SERVICE_ICONS = [<LuLayoutGrid />, <LuCodeXml />, <LuSparkles />, <LuWorkflow />, <LuDatabase />, <LuZap />]
 
 export default function About() {
   const { t } = useI18n()
@@ -43,9 +36,9 @@ export default function About() {
               <span className="about__panel-sub">{t.about.areas}</span>
             </div>
             <ul className="about__services">
-              {SERVICES.map((s, i) => (
+              {t.about.services.map((s, i) => (
                 <li key={i} className="service">
-                  <span className="service__icon" aria-hidden="true">{s.icon}</span>
+                  <span className="service__icon" aria-hidden="true">{SERVICE_ICONS[i]}</span>
                   <span className="service__text">
                     <span className="service__label">{s.label}</span>
                     <span className="service__hint">{s.hint}</span>
@@ -56,7 +49,7 @@ export default function About() {
           </FadeIn>
 
           <FadeIn className="about__panel about__panel--stack" delay={0.08}>
-            <Stack />
+            <Stack resetLabel={t.about.stackReset} />
           </FadeIn>
         </div>
 
@@ -88,7 +81,7 @@ export default function About() {
             <span className="about__panel-sub">{t.about.educationSub}</span>
           </div>
           <ul className="about__edu">
-            {portfolioData.education.map((edu, i) => (
+            {t.about.educationItems.map((edu, i) => (
               <li key={i} className="about__edu-row">
                 <span className="about__edu-logo" aria-hidden="true">
                   <LuGraduationCap />
@@ -98,7 +91,7 @@ export default function About() {
                   <p className="about__edu-degree">{edu.degree}</p>
                   <p className="about__edu-desc">{edu.description}</p>
                 </div>
-                <span className="about__edu-period">{t.about.period}</span>
+                <span className="about__edu-period">{edu.period}</span>
               </li>
             ))}
           </ul>

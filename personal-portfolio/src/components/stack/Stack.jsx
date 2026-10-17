@@ -1,20 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import { LuRotateCcw } from 'react-icons/lu'
+import {
+  SiReact, SiTypescript, SiJavascript, SiNodedotjs, SiHtml5, SiCss3, SiTailwindcss,
+  SiPython, SiPhp, SiLaravel, SiMysql, SiMongodb, SiDocker, SiGit, SiGithub,
+} from 'react-icons/si'
 import './stack.css'
 
 const CHIPS = [
-  { label: 'React', slug: 'react', bg: '#1FB6CB', fg: '#ffffff' },
-  { label: 'TypeScript', slug: 'typescript', bg: '#2F74C0', fg: '#ffffff' },
-  { label: 'JavaScript', slug: 'javascript', bg: '#f7df1e', fg: '#0a0a0a' },
-  { label: 'HTML5', slug: 'html5', bg: '#e34f26', fg: '#ffffff' },
-  { label: 'CSS', slug: 'css', bg: '#1572b6', fg: '#ffffff' },
-  { label: 'Tailwind CSS', slug: 'tailwindcss', bg: '#2BBCF5', fg: '#ffffff' },
-  { label: 'PHP', slug: 'php', bg: '#777BB4', fg: '#ffffff' },
-  { label: 'Laravel', slug: 'laravel', bg: '#ff2d20', fg: '#ffffff' },
-  { label: 'MySQL', slug: 'mysql', bg: '#4479A1', fg: '#ffffff' },
-  { label: 'MongoDB', slug: 'mongodb', bg: '#47A248', fg: '#ffffff' },
-  { label: 'Git', slug: 'git', bg: '#f05033', fg: '#ffffff' },
-  { label: 'GitHub', slug: 'github', bg: '#181717', fg: '#ffffff' },
+  { label: 'React', Icon: SiReact, bg: '#1FB6CB', fg: '#ffffff' },
+  { label: 'TypeScript', Icon: SiTypescript, bg: '#2F74C0', fg: '#ffffff' },
+  { label: 'JavaScript', Icon: SiJavascript, bg: '#f7df1e', fg: '#0a0a0a' },
+  { label: 'Node.js', Icon: SiNodedotjs, bg: '#5FA04E', fg: '#ffffff' },
+  { label: 'HTML5', Icon: SiHtml5, bg: '#e34f26', fg: '#ffffff' },
+  { label: 'CSS', Icon: SiCss3, bg: '#1572b6', fg: '#ffffff' },
+  { label: 'Tailwind CSS', Icon: SiTailwindcss, bg: '#2BBCF5', fg: '#ffffff' },
+  { label: 'Python', Icon: SiPython, bg: '#3776AB', fg: '#ffffff' },
+  { label: 'PHP', Icon: SiPhp, bg: '#777BB4', fg: '#ffffff' },
+  { label: 'Laravel', Icon: SiLaravel, bg: '#ff2d20', fg: '#ffffff' },
+  { label: 'MySQL', Icon: SiMysql, bg: '#4479A1', fg: '#ffffff' },
+  { label: 'MongoDB', Icon: SiMongodb, bg: '#47A248', fg: '#ffffff' },
+  { label: 'Docker', Icon: SiDocker, bg: '#2496ED', fg: '#ffffff' },
+  { label: 'Git', Icon: SiGit, bg: '#f05033', fg: '#ffffff' },
+  { label: 'GitHub', Icon: SiGithub, bg: '#181717', fg: '#ffffff' },
 ]
 
 const CHIP_RADIUS = 14
@@ -31,25 +38,15 @@ function ChipPill({ chip, innerRef }) {
         borderRadius: `${CHIP_RADIUS}px`,
       }}
     >
-      <span className="stack-chip__icon" aria-hidden="true">
-        {/* Deferred on purpose: these come from a third-party CDN, and eager
-            <img> requests delay the window load event the preloader waits on. */}
-        <img
-          src={`https://cdn.simpleicons.org/${chip.slug}`}
-          alt=""
-          width={18}
-          height={18}
-          loading="lazy"
-          decoding="async"
-          draggable={false}
-        />
+      <span className="stack-chip__icon" aria-hidden="true" style={{ color: chip.bg }}>
+        <chip.Icon />
       </span>
       <span>{chip.label}</span>
     </div>
   )
 }
 
-export default function Stack() {
+export default function Stack({ resetLabel = 'Reset stack' }) {
   const containerRef = useRef(null)
   const measureRef = useRef(null)
   const chipRefs = useRef([])
@@ -173,7 +170,7 @@ export default function Stack() {
         <button
           type="button"
           onClick={() => setResetKey((k) => k + 1)}
-          aria-label="Reiniciar stack"
+          aria-label={resetLabel}
           className="stack__reset focus-ring"
         >
           <LuRotateCcw aria-hidden="true" />

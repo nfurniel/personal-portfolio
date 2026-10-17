@@ -15,14 +15,14 @@ const POLAROIDS = [
   },
   {
     label: 'UTAD',
-    caption: 'DAWE · 2025',
+    caption: 'DAWE · 2026',
     rotate: 4,
     bg: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
     icon: <LuGraduationCap />,
   },
   {
     label: 'Code',
-    caption: '2 cafés/día',
+    caption: '2 coffees/day',
     rotate: -3,
     bg: 'linear-gradient(135deg, #0a0a0a 0%, #2a2a2a 100%)',
     icon: <LuCode />,

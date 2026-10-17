@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { motion as Motion } from 'motion/react'
-import { LuArrowUpRight, LuGithub, LuExternalLink } from 'react-icons/lu'
+import { LuArrowUpRight, LuExternalLink } from 'react-icons/lu'
 import { FadeIn } from '../lib/motion-primitives'
 import MetallicPaint from '../components/metallic-paint/MetallicPaint'
 import './projects.css'
@@ -12,47 +12,36 @@ const PROJECTS = [
   {
     id: 'quick-arrival',
     title: 'Quick Arrival App',
-    tag: 'Proyecto fin de ciclo · 2025',
-    description: 'Aplicación web que facilita la gestión de llegadas y reservas. Mi proyecto final del ciclo de DAWE.',
     accent: '#61dafb',
     accentText: '#ffffff',
     iconSrc: '/icons/react.svg',
     iconTint: '#a5e8ff',
     techs: ['React', 'JavaScript', 'Node'],
-    github: 'https://github.com/nfurniel/Quick-Arrival-App',
     demo: 'https://quick-arrival-app.vercel.app',
   },
   {
     id: 'cosmos-api',
     title: 'Cosmos API',
-    tag: 'Open source · 2025',
-    description: 'API REST de astronomía construida con FastAPI. Endpoints sobre planetas, datos espaciales y más.',
     accent: '#3776ab',
     accentText: '#ffffff',
     iconSrc: '/icons/python.svg',
     iconTint: '#ffd966',
     techs: ['Python', 'FastAPI', 'REST'],
-    github: 'https://github.com/nfurniel/cosmos-api',
     demo: 'https://cosmos-api-production.onrender.com/',
-    stars: 2,
   },
   {
     id: 'veta',
     title: 'Veta',
-    tag: 'Producto · 2026',
-    description: 'Filtro de convocatorias públicas para empresas: analiza la BDNS, descarta lo que no encaja y explica por qué una ayuda podría interesar, enlazando siempre a la fuente oficial.',
     accent: '#3178c6',
     accentText: '#ffffff',
     iconSrc: '/icons/typescript.svg',
     iconTint: '#9cc4ff',
-    techs: ['Next.js', 'TypeScript', 'React'],
+    techs: ['Next.js', 'TypeScript', 'RAG'],
     demo: 'https://veta-pi.vercel.app/',
   },
   {
     id: 'casas-madera-vip',
     title: 'Casas Madera VIP',
-    tag: 'Comercial · 2026',
-    description: 'Web comercial para un cliente real: restauración de casas de madera, con una UX interactiva moderna y transiciones fluidas.',
     accent: '#4f7cff',
     accentText: '#ffffff',
     iconSrc: '/icons/react.svg',
@@ -63,6 +52,8 @@ const PROJECTS = [
 ]
 
 const ProjectCard = memo(function ProjectCard({ project, index }) {
+  const { t, translate } = useI18n()
+  const copy = t.projects.items[project.id]
   return (
     <Motion.article
       className="proj-card"
@@ -73,10 +64,10 @@ const ProjectCard = memo(function ProjectCard({ project, index }) {
     >
       <a
         className="proj-card__media"
-        href={project.demo || project.github}
+        href={project.demo}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`${project.title} — abrir ${project.demo ? 'demo' : 'repo'}`}
+        aria-label={translate(t.projects.openLabel, { title: project.title })}
         style={{ '--accent': project.accent, '--accent-text': project.accentText }}
       >
         <div className="proj-card__media-bg" />
@@ -100,15 +91,10 @@ const ProjectCard = memo(function ProjectCard({ project, index }) {
 
       <div className="proj-card__body">
         <div className="proj-card__meta">
-          <span className="proj-card__tag">{project.tag}</span>
-          {project.stars ? (
-            <span className="proj-card__stars" aria-label={`${project.stars} estrellas en GitHub`}>
-              ★ {project.stars}
-            </span>
-          ) : null}
+          <span className="proj-card__tag">{copy.tag}</span>
         </div>
         <h3 className="proj-card__title">{project.title}</h3>
-        <p className="proj-card__desc">{project.description}</p>
+        <p className="proj-card__desc">{copy.description}</p>
 
         <div className="proj-card__footer">
           <ul className="proj-card__techs">
@@ -117,16 +103,9 @@ const ProjectCard = memo(function ProjectCard({ project, index }) {
             ))}
           </ul>
           <div className="proj-card__actions" onClick={(e) => e.stopPropagation()}>
-            {project.github && (
-              <a href={project.github} target="_blank" rel="noopener noreferrer" className="proj-card__action focus-ring" aria-label={`${project.title} en GitHub`}>
-                <LuGithub aria-hidden="true" />
-              </a>
-            )}
-            {project.demo && (
-              <a href={project.demo} target="_blank" rel="noopener noreferrer" className="proj-card__action focus-ring" aria-label={`Demo de ${project.title}`}>
-                <LuExternalLink aria-hidden="true" />
-              </a>
-            )}
+            <a href={project.demo} target="_blank" rel="noopener noreferrer" className="proj-card__action focus-ring" aria-label={translate(t.projects.demoLabel, { title: project.title })}>
+              <LuExternalLink aria-hidden="true" />
+            </a>
           </div>
         </div>
       </div>

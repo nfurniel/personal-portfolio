@@ -44,7 +44,7 @@ export default function Contact({ email, linkedin, github }) {
   const quickInfo = QUICK_INFO.map((item, index) => ({
     ...item,
     label: [t.contact.location, t.contact.hours, t.contact.availability][index],
-    value: [item.value, t.contact.hoursValue, t.contact.availabilityValue][index],
+    value: [t.contact.locationValue, t.contact.hoursValue, t.contact.availabilityValue][index],
   }))
 
   return (
