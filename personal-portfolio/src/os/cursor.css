@@ -1,0 +1,32 @@
+/* ---------- Pixel cursors ----------
+   The images are baked in cursors.js and arrive as --cur-* variables. Until
+   they exist (or on touch devices) every rule below is simply invalid and the
+   browser keeps its own cursors. */
+
+html .nos-page,
+html .nos-page * {
+  cursor: var(--cur-arrow);
+}
+
+html .nos-page :is(a, button, select, summary, label[for], [role='button'], [role='menuitem']),
+html .nos-page :is(a, button, [role='button']) *,
+html .nos-page .buddy__hit {
+  cursor: var(--cur-hand);
+}
+
+html .nos-page :is(button:disabled, .os-icon.is-ghost),
+html .nos-page :is(button:disabled, .os-icon.is-ghost) * {
+  cursor: var(--cur-arrow);
+}
+
+html .nos-page :is(input:not([type='button']):not([type='submit']), textarea, .app-term) {
+  cursor: var(--cur-text);
+}
+
+/* Dragging something (an icon, a window, Mini Nico): the closed hand. */
+html.nos-dragging .nos-page,
+html.nos-dragging .nos-page *,
+html .nos-page .os-window__bar:active,
+html .nos-page .buddy.is-held .buddy__hit {
+  cursor: var(--cur-grab);
+}
