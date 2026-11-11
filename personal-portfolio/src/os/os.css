@@ -562,8 +562,11 @@ html.nos-vt::view-transition-new(root) {
 
 /* Phones: no moving grain. */
 @media (max-width: 700px) {
-  .nos-grain {
-    animation: none;
+  /* Phones: no film grain or vignette. On a small, dense screen the grain
+     reads as a blurry, low-quality image and the vignette as patchy light. */
+  .nos-grain,
+  .nos-term::after {
+    display: none;
   }
 
   .nos-term {

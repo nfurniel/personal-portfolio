@@ -947,11 +947,18 @@
 
 /* Phones get a still wallpaper: a dot grid and two soft glows. */
 .is-compact .os-wall {
-  background:
-    radial-gradient(circle, color-mix(in srgb, var(--nos-violet) 26%, transparent) 1px, transparent 1.6px) 0 0 / 22px 22px,
-    radial-gradient(ellipse 80% 45% at 85% 12%, color-mix(in srgb, var(--nos-violet) 20%, transparent), transparent 70%),
-    radial-gradient(ellipse 80% 45% at 10% 88%, color-mix(in srgb, var(--nos-blue) 16%, transparent), transparent 70%),
-    var(--nos-black);
+  background: var(--nos-black);
+}
+
+/* Phones get a still wallpaper: a flat colour and a grid of square pixel
+   dots, drawn by a crisp SVG mask (no gradients, so no banding or blur). */
+.is-compact .os-wall::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--nos-violet) 34%, transparent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'%3E%3Crect x='11' y='11' width='2' height='2'/%3E%3C/svg%3E") 0 0 / 24px 24px repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'%3E%3Crect x='11' y='11' width='2' height='2'/%3E%3C/svg%3E") 0 0 / 24px 24px repeat;
 }
 
 .os-icons {
