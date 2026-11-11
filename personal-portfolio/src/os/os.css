@@ -1,0 +1,572 @@
+/* ---------- Nicolás OS: the whole page ----------
+   One screen, no page scroll. A terminal card sits in the middle of the
+   page; it boots into the desktop, which holds the entire portfolio. */
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+.nos-page {
+  /* Broken black and white: warm off-black and paper off-white, never pure. */
+  --nos-black: #0e0e0d;
+  --nos-black-2: #161615;
+  --nos-white: #e9e7e0;
+  --nos-dim: #8d8a82;
+  --nos-line: rgba(233, 231, 224, 0.14);
+  --nos-mono: 'VT323', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.nos-stage {
+  position: absolute;
+  inset: 0;
+}
+
+/* The terminal card: nearly the whole window, with breathing room. */
+.nos-term {
+  position: absolute;
+  inset: max(1.25rem, calc((100% - 880px) / 2)) max(1.25rem, calc((100% - 1440px) / 2));
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--nos-line);
+  border-radius: 14px;
+  background: var(--nos-black);
+  color: var(--nos-white);
+  font-family: var(--nos-mono);
+  box-shadow:
+    0 40px 90px -30px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.4);
+  transition:
+    inset 0.9s cubic-bezier(0.76, 0, 0.24, 1),
+    border-radius 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Fullscreen: the real Fullscreen API, or (where it is missing) the card
+   filling the window. */
+.nos-term:fullscreen,
+.nos-stage.is-expanded .nos-term {
+  inset: 0;
+  border-radius: 0;
+  border-color: transparent;
+}
+
+.nos-term:fullscreen {
+  width: 100%;
+  height: 100%;
+}
+
+.nos-term__bar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.9rem;
+  height: 40px;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--nos-line);
+  background: var(--nos-black-2);
+}
+
+.nos-term__dots {
+  display: flex;
+  gap: 7px;
+}
+
+.nos-term__dots i {
+  width: 11px;
+  height: 11px;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 55%, transparent);
+  border-radius: 50%;
+}
+
+.nos-term__dots i:first-child {
+  background: var(--nos-white);
+}
+
+.nos-term__title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--nos-dim);
+  pointer-events: none;
+}
+
+.nos-tool {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.05rem 0.6rem;
+  border: 1px solid var(--nos-line);
+  font-family: var(--nos-mono);
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--nos-white);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nos-tool:hover,
+.nos-tool:focus-visible {
+  background: var(--nos-white);
+  color: var(--nos-black);
+  outline: none;
+}
+
+.nos-term__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ---------- Start screen (the CLI) ---------- */
+.nos-intro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(1.25rem, 3vh, 2rem);
+  padding: clamp(1.25rem, 4vw, 3.25rem);
+  overflow: auto;
+}
+
+.nos-banner {
+  margin: 0;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: clamp(4px, 1.05vw, 12px);
+  line-height: 1;
+  white-space: pre;
+  color: var(--nos-white);
+  text-shadow: 0 0 14px rgba(233, 231, 224, 0.25);
+}
+
+.nos-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: clamp(1.1rem, 1.7vw, 1.45rem);
+  line-height: 1.25;
+}
+
+.nos-prompt {
+  color: var(--nos-dim);
+}
+
+.nos-out {
+  color: color-mix(in srgb, var(--nos-white) 82%, transparent);
+}
+
+.nos-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1.6rem;
+}
+
+.nos-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1em;
+  margin-left: 0.3em;
+  vertical-align: -0.12em;
+  background: var(--nos-white);
+  animation: nos-blink 1s steps(1) infinite;
+}
+
+@keyframes nos-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* The lines type themselves in, one after another. */
+.nos-lines p,
+.nos-start {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.35s ease calc(var(--i) * 0.32s + 0.2s),
+    transform 0.35s ease calc(var(--i) * 0.32s + 0.2s);
+}
+
+.nos-intro.is-typed .nos-lines p,
+.nos-intro.is-typed .nos-start {
+  opacity: 1;
+  transform: none;
+}
+
+.nos-start {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.7rem;
+  padding: 0.55rem 1.4rem 0.5rem;
+  border: 1px solid var(--nos-white);
+  font-family: var(--nos-mono);
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nos-black);
+  background: var(--nos-white);
+  box-shadow: 0 0 0 0 rgba(233, 231, 224, 0.35);
+  animation: nos-pulse 2.4s ease-in-out infinite;
+}
+
+.nos-start:hover,
+.nos-start:focus-visible {
+  background: transparent;
+  color: var(--nos-white);
+  outline: none;
+}
+
+.nos-start:disabled {
+  cursor: progress;
+}
+
+.nos-start svg {
+  width: 0.8em;
+  height: 0.8em;
+}
+
+@keyframes nos-pulse {
+  50% {
+    box-shadow: 0 0 0 10px rgba(233, 231, 224, 0);
+  }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(233, 231, 224, 0.28);
+  }
+}
+
+/* ---------- Terminal output helpers ---------- */
+.nos-dim {
+  color: var(--nos-dim);
+}
+
+.nos-err {
+  color: var(--nos-white);
+}
+
+.nos-err::before {
+  content: '! ';
+  color: var(--nos-dim);
+}
+
+.nos-strong {
+  font-weight: 400;
+  color: var(--nos-white);
+}
+
+.nos-help {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0 1.6rem;
+}
+
+.nos-help__row {
+  display: contents;
+}
+
+.nos-help__row b {
+  font-weight: 400;
+  color: var(--nos-white);
+  white-space: pre;
+}
+
+.nos-help__row span,
+.nos-help__row a {
+  color: color-mix(in srgb, var(--nos-white) 72%, transparent);
+}
+
+.nos-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--nos-white);
+  font: inherit;
+  caret-color: var(--nos-white);
+  caret-shape: block;
+}
+
+/* A block caret would sit on top of the placeholder's first letter. */
+.nos-input:placeholder-shown {
+  caret-shape: auto;
+}
+
+.nos-input::placeholder {
+  color: color-mix(in srgb, var(--nos-white) 30%, transparent);
+}
+
+/* ---------- Film grain + vignette over the whole terminal ---------- */
+.nos-grain {
+  position: absolute;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.09;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -0.2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation: nos-grain 0.8s steps(5) infinite;
+}
+
+.nos-term::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 59;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.38) 100%);
+}
+
+@keyframes nos-grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-6%, 4%);
+  }
+  40% {
+    transform: translate(5%, -7%);
+  }
+  60% {
+    transform: translate(-3%, 8%);
+  }
+  80% {
+    transform: translate(7%, 2%);
+  }
+  100% {
+    transform: translate(-4%, -5%);
+  }
+}
+
+@media (max-width: 700px) {
+  .nos-term {
+    inset: 0.75rem;
+  }
+
+  .nos-term__title {
+    display: none;
+  }
+
+  /* Icon-only bar buttons on phones; the label stays as aria-label. */
+  .nos-tool__label {
+    display: none;
+  }
+
+  .nos-tool {
+    padding: 0.2rem 0.45rem;
+  }
+
+  .nos-intro {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nos-term,
+  .nos-lines p,
+  .nos-start {
+    transition: none;
+  }
+
+  .nos-grain,
+  .nos-cursor,
+  .nos-start {
+    animation: none;
+  }
+}
+
+/* ---------- Colour theme ----------
+   Deep ink-blue instead of pure black, a soft off-white, and a small
+   palette of accents (each app gets one as --app). */
+.nos-page,
+.nos-screen {
+  --nos-black: #0b0b12;
+  --nos-black-2: #141420;
+  --nos-white: #ecebf5;
+  --nos-dim: #8f8cab;
+  --nos-line: rgba(236, 235, 245, 0.14);
+  --nos-green: #6ef2b0;
+  --nos-blue: #6ea8ff;
+  --nos-violet: #b79bff;
+  --nos-pink: #ff9ffc;
+  --nos-amber: #ffcf5c;
+  --nos-surface: #12121c; /* windows and menus */
+  --nos-bar: rgba(12, 12, 20, 0.9); /* taskbar */
+  --nos-on-acc: #0b0b12; /* text on an accent colour */
+  --nos-shadow: rgba(0, 0, 0, 0.55);
+  --nos-label: rgba(11, 11, 18, 0.62); /* behind icon names */
+}
+
+/* macOS-like traffic lights. */
+.nos-term__dots i {
+  border: 0;
+}
+
+.nos-term__dots i:nth-child(1),
+.nos-term__dots i:first-child {
+  background: #ff5f57;
+}
+
+.nos-term__dots i:nth-child(2) {
+  background: #febc2e;
+}
+
+.nos-term__dots i:nth-child(3) {
+  background: #28c840;
+}
+
+.nos-banner {
+  background: linear-gradient(90deg, var(--nos-blue), var(--nos-violet) 45%, var(--nos-pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 0 12px rgba(183, 155, 255, 0.35));
+}
+
+.nos-prompt {
+  color: var(--nos-green);
+}
+
+.nos-cursor {
+  background: var(--nos-pink);
+}
+
+.nos-start {
+  border-color: transparent;
+  background: linear-gradient(90deg, var(--nos-blue), var(--nos-violet), var(--nos-pink));
+  color: var(--nos-on-acc);
+}
+
+.nos-start:hover,
+.nos-start:focus-visible {
+  border-color: var(--nos-pink);
+  background: transparent;
+  color: var(--nos-pink);
+}
+
+.nos-tool:hover,
+.nos-tool:focus-visible {
+  border-color: var(--nos-violet);
+  background: var(--nos-violet);
+  color: var(--nos-on-acc);
+}
+
+.nos-err::before {
+  color: #ff6b8b;
+}
+
+.nos-help__row b {
+  color: var(--nos-blue);
+}
+
+/* ---------- Page, dark screens and accents ---------- */
+
+/* Plain black around the card (the animated backdrop is off for now). */
+.nos-page {
+  background: #050507;
+}
+
+/* A .nos-screen keeps the dark palette in any theme: the terminal, the
+   browser, a game board. */
+.nos-screen {
+  --app: var(--app-c);
+  background: var(--nos-black);
+  color: var(--nos-white);
+}
+
+/* Components set their accent inline as --app-c; --app is what the styles
+   read, so a theme can re-tint it. */
+.nos-page [style*='--app-c'] {
+  --app: var(--app-c);
+}
+
+/* ---------- Light theme ----------
+   Only the running system changes (the start screen and the boot stay dark):
+   warm paper, ink text, and every accent deepened so it still reads. */
+html[data-nos-theme='light'] .nos-stage.is-on {
+  --nos-black: #efece3;
+  --nos-black-2: #e3dfd2;
+  --nos-white: #1b1830;
+  --nos-dim: #6b6782;
+  --nos-line: rgba(27, 24, 48, 0.18);
+  --nos-green: #0f7a55;
+  --nos-blue: #2f5fd0;
+  --nos-violet: #6a45d6;
+  --nos-pink: #b8369a;
+  --nos-amber: #a06400;
+  --nos-surface: #f9f7f0;
+  --nos-bar: rgba(233, 229, 218, 0.94);
+  --nos-on-acc: #fdfcf7;
+  --nos-shadow: rgba(27, 24, 48, 0.24);
+  --nos-label: rgba(239, 236, 227, 0.78);
+}
+
+html[data-nos-theme='light'] .nos-stage.is-on [style*='--app-c'] {
+  --app: color-mix(in srgb, var(--app-c) 44%, #1b1830);
+}
+
+html[data-nos-theme='light'] .nos-stage.is-on .nos-term::after {
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(27, 24, 48, 0.1) 100%);
+}
+
+html[data-nos-theme='light'] .nos-stage.is-on .nos-grain {
+  opacity: 0.05;
+  filter: invert(1);
+}
+
+html[data-nos-theme='light'] .nos-stage.is-on .os-icon__art {
+  filter: none;
+}
+
+/* ---------- Theme switch: the pixel reveal ----------
+   theme.js animates the clip path of the new page; this hides it until that
+   animation starts, so there is no flash of the finished theme. */
+html.nos-vt::view-transition-old(root),
+html.nos-vt::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html.nos-vt::view-transition-new(root) {
+  clip-path: path('M0 0h0v0z');
+}
+
+/* Phones: no moving grain. */
+@media (max-width: 700px) {
+  .nos-grain {
+    animation: none;
+  }
+
+  .nos-term {
+    inset: 0.5rem;
+  }
+}

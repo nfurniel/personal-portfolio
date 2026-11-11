@@ -1,0 +1,274 @@
+.hk {
+  position: absolute;
+  inset: 0;
+  /* Sized from the terminal, not the viewport: it runs inside the card. */
+  container-type: size;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--nos-black);
+  color: var(--nos-white);
+  font-family: var(--nos-mono);
+}
+
+.hk-rain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.55;
+}
+
+.hk-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(12, 12, 11, 0.55) 0%, rgba(12, 12, 11, 0.2) 45%, rgba(12, 12, 11, 0.92) 100%);
+  pointer-events: none;
+}
+
+.hk-title {
+  position: absolute;
+  top: clamp(1rem, 5cqh, 3rem);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(1.2rem, 3.4cqw, 3rem);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--nos-white) 30%, transparent);
+  text-shadow: 0 0 18px rgba(232, 230, 223, 0.15);
+}
+
+.hk-center {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1rem, 3vh, 2rem);
+  width: min(92%, 640px);
+}
+
+.hk-face {
+  margin: 0;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: clamp(3.4px, min(0.56cqw, 0.88cqh), 7.5px);
+  line-height: 1.02;
+  letter-spacing: 0.02em;
+  white-space: pre;
+  color: var(--nos-white);
+  text-shadow: 0 0 6px rgba(240, 238, 230, 0.35);
+}
+
+.hk-face span {
+  opacity: 0;
+  transition: opacity 0.12s linear;
+}
+
+.hk-face span.is-on {
+  opacity: 0.9;
+}
+
+.is-granted .hk-face {
+  animation: hk-glitch 0.4s steps(2) 2;
+}
+
+@keyframes hk-glitch {
+  0% {
+    transform: translateX(0);
+    filter: none;
+  }
+  50% {
+    transform: translateX(-3px) skewX(-2deg);
+    filter: contrast(1.6);
+  }
+  100% {
+    transform: translateX(2px);
+  }
+}
+
+.hk-progress {
+  width: 100%;
+}
+
+.hk-bar {
+  display: grid;
+  grid-template-columns: repeat(28, 1fr);
+  gap: 3px;
+  height: 18px;
+  padding: 3px;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 45%, transparent);
+}
+
+.hk-bar span {
+  background: color-mix(in srgb, var(--nos-white) 8%, transparent);
+  transition: background 0.1s linear;
+}
+
+.hk-bar span.is-on {
+  background: var(--nos-white);
+  box-shadow: 0 0 8px rgba(240, 238, 230, 0.4);
+}
+
+.hk-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--nos-white) 75%, transparent);
+}
+
+.hk-pct {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hazard band + "entering…" at 100%. */
+.hk-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(110px, 18vh, 170px);
+  transform: translateY(-50%) scaleY(0);
+  background:
+    repeating-linear-gradient(
+      -55deg,
+      color-mix(in srgb, var(--nos-white) 14%, transparent) 0 26px,
+      transparent 26px 56px
+    ),
+    rgba(12, 12, 11, 0.82);
+  background-size: 200% 100%;
+  pointer-events: none;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.is-granted .hk-band {
+  transform: translateY(-50%) scaleY(1);
+  animation: hk-stripes 1.2s linear infinite;
+}
+
+@keyframes hk-stripes {
+  to {
+    background-position: -112px 0;
+  }
+}
+
+.hk-band__text {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: clamp(1.6rem, 4.6cqw, 3.4rem);
+  letter-spacing: 0.1em;
+  color: var(--nos-white);
+  text-shadow: 0 0 22px rgba(240, 238, 230, 0.45);
+}
+
+.hk-dots::after {
+  content: '';
+  display: inline-block;
+  width: 1.6em;
+  text-align: left;
+  animation: hk-dots 1.2s steps(4) infinite;
+}
+
+@keyframes hk-dots {
+  0% {
+    content: '';
+  }
+  25% {
+    content: '.';
+  }
+  50% {
+    content: '..';
+  }
+  75% {
+    content: '...';
+  }
+}
+
+.hk-band__text svg {
+  width: 0.8em;
+  height: 0.8em;
+}
+
+.hk-skip {
+  position: absolute;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vh, 2rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 35%, transparent);
+  font-family: var(--nos-mono);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--nos-white) 75%, transparent);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.hk-skip:hover,
+.hk-skip:focus-visible {
+  background: var(--nos-white);
+  color: var(--nos-black);
+  outline: none;
+}
+
+/* Phones: the portrait uses fewer columns (62), so it can be drawn larger. */
+@container (max-width: 700px) {
+  .hk-face {
+    font-size: clamp(3.4px, min(2.3cqw, 1.1cqh), 9px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hk-band,
+  .hk-face span {
+    transition: none;
+  }
+
+  .is-granted .hk-band,
+  .is-granted .hk-face {
+    animation: none;
+  }
+}
+
+/* ---------- Colour theme ---------- */
+.hk-title {
+  color: color-mix(in srgb, var(--nos-violet, #b79bff) 55%, transparent);
+}
+
+.hk-face {
+  color: var(--nos-violet, #b79bff);
+  text-shadow: 0 0 6px rgba(183, 155, 255, 0.45);
+}
+
+.hk-bar {
+  border-color: rgba(183, 155, 255, 0.5);
+}
+
+/* Segments run from blue to pink along the bar. */
+.hk-bar span.is-on {
+  background: hsl(calc(220 + var(--i, 0) * 3.4) 95% 72%);
+  box-shadow: 0 0 8px hsl(calc(220 + var(--i, 0) * 3.4) 95% 72% / 0.5);
+}
+
+.hk-band {
+  background:
+    repeating-linear-gradient(-55deg, rgba(255, 159, 252, 0.18) 0 26px, transparent 26px 56px),
+    rgba(11, 11, 18, 0.85);
+}
+
+.hk-band__text {
+  color: var(--nos-green, #6ef2b0);
+  text-shadow: 0 0 22px rgba(110, 242, 176, 0.5);
+}

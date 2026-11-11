@@ -1,0 +1,1399 @@
+/* ---------- Nicolás OS desktop: terminal style ----------
+   Same language as the start screen: VT323, broken black and white, 1px
+   rules, inverted title bars, pixel icons. Colours come from the --nos-*
+   tokens on .nos-page. */
+
+.px-icon {
+  display: block;
+  overflow: visible;
+}
+
+.os-desktop {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  overflow: hidden;
+  background: var(--nos-black);
+  color: var(--nos-white);
+  font-family: var(--nos-mono);
+}
+
+/* Faint scanlines plus a dim banner, like a CRT idling. */
+.os-wallpaper {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(233, 231, 224, 0.035) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at 55% 45%, rgba(233, 231, 224, 0.05), transparent 60%);
+}
+
+.os-wallpaper__mark {
+  position: absolute;
+  left: 56%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(3.5rem, 10cqw, 9rem);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  color: var(--nos-white);
+  opacity: 0.05;
+}
+
+/* ---------- Icons ---------- */
+.os-icons {
+  position: absolute;
+  top: 20px;
+  left: 18px;
+  bottom: 90px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.os-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 116px;
+  padding: 10px 6px 8px;
+  border: 1px dashed transparent;
+  color: var(--nos-white);
+  font-family: var(--nos-mono);
+}
+
+.os-icon__art {
+  /* Same height for every icon so the labels line up. */
+  width: auto;
+  max-width: 56px;
+  height: 44px;
+  transition: transform 0.25s steps(3);
+}
+
+.os-icon__label {
+  padding: 0 4px;
+  font-size: 1.2rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.os-icon:hover,
+.os-icon:focus-visible {
+  border-color: color-mix(in srgb, var(--nos-white) 55%, transparent);
+  outline: none;
+}
+
+.os-icon:hover .os-icon__art,
+.os-icon:focus-visible .os-icon__art {
+  transform: translateY(-3px);
+}
+
+.os-icon.is-open .os-icon__label {
+  background: var(--nos-white);
+  color: var(--nos-black);
+}
+
+/* ---------- Windows ---------- */
+.os-windows {
+  position: absolute;
+  inset: 0 0 44px 0;
+  pointer-events: none;
+}
+
+.os-window-shell {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - 32px);
+  pointer-events: auto;
+}
+
+.os-window-shell.is-full {
+  inset: 12px;
+  width: auto;
+  max-height: none;
+}
+
+.os-window {
+  position: relative;
+  container-type: inline-size;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 35%, transparent);
+  background: var(--nos-surface);
+  color: var(--nos-white);
+  /* box-shadow, not filter: a filter repaints the window every drag frame. */
+  box-shadow: 8px 8px 0 var(--nos-shadow);
+  will-change: transform;
+}
+
+.os-window.is-focused {
+  border-color: var(--nos-white);
+}
+
+.os-window__bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 34px;
+  padding: 0 6px 0 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--nos-white) 35%, transparent);
+  color: var(--nos-dim);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+/* The focused window gets the inverted (white) title bar. */
+.os-window.is-focused .os-window__bar {
+  border-bottom-color: var(--nos-white);
+  background: var(--nos-white);
+  color: var(--nos-black);
+}
+
+.os-window__bar:active,
+.os-window.is-dragging,
+.os-window.is-dragging * {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.is-full .os-window__bar {
+  cursor: default;
+}
+
+.os-window__icon {
+  width: 20px;
+  flex: none;
+}
+
+.os-window__icon svg {
+  width: 100%;
+  height: auto;
+}
+
+.os-window__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 1.3rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.os-window__controls {
+  display: flex;
+  gap: 4px;
+}
+
+.os-ctrl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 22px;
+  border: 1px solid currentColor;
+  color: inherit;
+  font-size: 0.85rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.os-ctrl:hover,
+.os-ctrl:focus-visible {
+  background: var(--nos-black);
+  color: var(--nos-white);
+  outline: none;
+}
+
+.os-window:not(.is-focused) .os-ctrl:hover,
+.os-window:not(.is-focused) .os-ctrl:focus-visible {
+  background: var(--nos-white);
+  color: var(--nos-black);
+}
+
+.os-window__body {
+  min-height: 0;
+  padding: 16px 18px 20px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--nos-white) 25%, transparent) transparent;
+}
+
+/* ---------- Start menu ---------- */
+.os-start.is-on {
+  border-color: var(--nos-white);
+  background: var(--nos-white);
+  color: var(--nos-black);
+}
+
+.os-start-menu {
+  position: absolute;
+  left: 8px;
+  bottom: 50px;
+  z-index: 80;
+  width: min(300px, calc(100% - 16px));
+  border: 1px solid var(--nos-white);
+  background: var(--nos-surface);
+  box-shadow: 8px 8px 0 var(--nos-shadow);
+}
+
+.os-start-menu__head {
+  padding: 6px 12px;
+  background: var(--nos-white);
+  color: var(--nos-black);
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+}
+
+.os-start-menu__head .nos-dim {
+  color: color-mix(in srgb, var(--nos-black) 60%, transparent);
+}
+
+.os-start-menu ul {
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+}
+
+.os-start-menu button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 5px 14px;
+  color: var(--nos-white);
+  font-family: var(--nos-mono);
+  font-size: 1.25rem;
+  text-align: left;
+}
+
+.os-start-menu button svg {
+  width: 20px;
+  height: auto;
+  flex: none;
+}
+
+.os-start-menu button:hover,
+.os-start-menu button:focus-visible {
+  background: var(--nos-white);
+  color: var(--nos-black);
+  outline: none;
+}
+
+.os-start-menu__sep {
+  height: 1px;
+  margin: 6px 0;
+  background: color-mix(in srgb, var(--nos-white) 25%, transparent);
+}
+
+/* ---------- Apps: shared ---------- */
+.app-kicker {
+  margin: 0.6rem 0 0.2rem;
+  font-size: 1.15rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--nos-dim);
+}
+
+.app-kicker:first-child {
+  margin-top: 0;
+}
+
+.app-title {
+  font-size: clamp(1.9rem, 3cqw + 1rem, 2.6rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+}
+
+.app-text {
+  margin-top: 0.4rem;
+  font-size: 1.28rem;
+  line-height: 1.2;
+  color: color-mix(in srgb, var(--nos-white) 85%, transparent);
+}
+
+.app-soft {
+  color: color-mix(in srgb, var(--nos-white) 62%, transparent);
+}
+
+.app-dim {
+  color: var(--nos-dim);
+}
+
+.app-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.15rem 1.4rem;
+  margin: 0.3rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 1.2rem;
+}
+
+.app-list li {
+  display: contents;
+}
+
+.app-list b {
+  font-weight: 400;
+}
+
+.app-list span {
+  color: var(--nos-dim);
+}
+
+.app-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0.6rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-tags li {
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 45%, transparent);
+  font-size: 1.1rem;
+}
+
+.app-cta,
+.app-mini,
+.app-link {
+  font-family: var(--nos-mono);
+}
+
+.app-cta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.45rem;
+  padding: 0.3rem 1rem;
+  border: 1px solid var(--nos-white);
+  background: var(--nos-white);
+  color: var(--nos-black);
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-cta:hover,
+.app-cta:focus-visible {
+  background: transparent;
+  color: var(--nos-white);
+  outline: none;
+}
+
+.app-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 40%, transparent);
+  color: var(--nos-white);
+  font-size: 1.1rem;
+}
+
+.app-mini:hover,
+.app-mini:focus-visible {
+  background: var(--nos-white);
+  color: var(--nos-black);
+  outline: none;
+}
+
+.app-link {
+  padding: 0;
+  color: var(--nos-white);
+  font-size: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.os-window__body a:not(.app-cta):not(.app-mini):not([class*='fb-']) {
+  color: var(--nos-white);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.app-dot {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  background: var(--nos-white);
+  animation: nos-blink 1.6s steps(1) infinite;
+}
+
+/* ---------- Folder window ---------- */
+.app-folder__path {
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--nos-white) 18%, transparent);
+  font-size: 1.15rem;
+  color: var(--nos-dim);
+}
+
+.app-folder__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-folder__grid .os-icon {
+  width: 100%;
+}
+
+.os-icon.is-ghost {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ---------- Project viewer ---------- */
+.app-project {
+  display: grid;
+  gap: 18px;
+}
+
+@container (min-width: 620px) {
+  .app-project {
+    grid-template-columns: 1.2fr 1fr;
+    align-items: start;
+  }
+}
+
+.app-project__shot {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 30%, transparent);
+  background: var(--nos-black);
+}
+
+/* Screenshots sit in black and white with the rest of the OS and come back
+   to colour on hover. */
+.app-project__shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  filter: grayscale(1) contrast(1.05);
+  transition: filter 0.4s ease;
+}
+
+.app-project__shot:hover img {
+  filter: none;
+}
+
+.app-project__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-api {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--nos-black);
+}
+
+.app-api__bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0.8rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--nos-white) 20%, transparent);
+  font-size: 1rem;
+}
+
+.app-api code,
+.app-api em,
+.app-api pre {
+  font-family: var(--nos-mono);
+  font-style: normal;
+}
+
+.app-api pre {
+  flex: 1;
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  overflow: hidden;
+  font-size: clamp(0.95rem, 1.6cqw, 1.2rem);
+  line-height: 1.25;
+  white-space: pre-wrap;
+}
+
+.app-api i {
+  font-style: normal;
+  color: var(--nos-dim);
+}
+
+.app-api b {
+  font-weight: 400;
+}
+
+/* ---------- About ---------- */
+.app-about {
+  display: grid;
+  gap: 18px;
+}
+
+@container (min-width: 640px) {
+  .app-about {
+    grid-template-columns: 220px 1fr;
+    align-items: start;
+  }
+}
+
+.app-about__photo {
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 30%, transparent);
+  filter: grayscale(1) contrast(1.1);
+}
+
+/* ---------- Career ---------- */
+.app-career {
+  display: grid;
+  gap: 22px;
+}
+
+.app-log__entry {
+  padding: 10px 0 12px;
+  border-top: 1px dashed color-mix(in srgb, var(--nos-white) 22%, transparent);
+}
+
+.app-log__org {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.app-log__role {
+  font-size: 1.25rem;
+}
+
+/* ---------- Stack ---------- */
+.app-stack__list {
+  display: grid;
+  gap: 2px;
+  margin: 0.3rem 0;
+  padding: 0 0 0 1.2rem;
+  list-style: none;
+  font-size: 1.25rem;
+}
+
+.app-stack__list li {
+  display: grid;
+  grid-template-columns: 1.4rem minmax(8rem, 1fr) auto auto;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.app-stack__icon {
+  display: inline-flex;
+  color: var(--nos-white);
+}
+
+.app-stack__bar {
+  letter-spacing: 0.08em;
+}
+
+.app-stack__level {
+  min-width: 6rem;
+}
+
+/* ---------- Contact ---------- */
+.app-rows {
+  margin: 0.8rem 0 1rem;
+}
+
+.app-rows > div {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 1rem;
+  padding: 4px 0;
+  border-top: 1px dashed color-mix(in srgb, var(--nos-white) 18%, transparent);
+  font-size: 1.25rem;
+}
+
+.app-rows dt {
+  color: var(--nos-dim);
+}
+
+.app-rows dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.8rem;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- CV ---------- */
+.app-cv__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.app-cv__page {
+  display: block;
+  width: 100%;
+  height: min(66vh, 760px);
+  min-height: 420px;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 30%, transparent);
+  background: #fff;
+}
+
+.app-cv__phone {
+  display: none;
+}
+
+/* Touch screens: no inline PDF, just the buttons and the note. */
+@media (pointer: coarse) {
+  .app-cv__page {
+    display: none;
+  }
+
+  .app-cv__phone {
+    display: block;
+  }
+}
+
+/* ---------- Settings ---------- */
+.app-settings {
+  display: grid;
+  gap: 18px;
+}
+
+.app-seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.app-seg button {
+  padding: 2px 12px;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 40%, transparent);
+  color: var(--nos-white);
+  font-family: var(--nos-mono);
+  font-size: 1.2rem;
+}
+
+.app-seg button.is-on,
+.app-seg button:hover,
+.app-seg button:focus-visible {
+  border-color: var(--nos-white);
+  background: var(--nos-white);
+  color: var(--nos-black);
+  outline: none;
+}
+
+/* ---------- Readme ---------- */
+.app-readme .app-text {
+  margin-top: 0.3rem;
+}
+
+/* ---------- Snake ---------- */
+.app-snake {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  outline: none;
+}
+
+.app-snake__hud {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 420px;
+  font-size: 1.25rem;
+  color: var(--nos-dim);
+}
+
+.app-snake__hud b {
+  font-weight: 400;
+  color: var(--nos-white);
+}
+
+.app-snake__board {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 55%, transparent);
+  touch-action: none;
+}
+
+.app-snake:focus-visible .app-snake__board {
+  border-color: var(--nos-white);
+}
+
+.app-snake__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.app-snake__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(14, 14, 13, 0.72);
+  text-align: center;
+}
+
+.app-snake__overlay .app-cta {
+  align-self: center;
+}
+
+.app-snake__msg {
+  font-size: clamp(1.6rem, 5cqw, 2.4rem);
+  letter-spacing: 0.1em;
+}
+
+.app-snake__pad {
+  display: grid;
+  grid-template-areas: '. up .' 'left down right';
+  gap: 4px;
+}
+
+.app-snake__pad button {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 38px;
+  border: 1px solid color-mix(in srgb, var(--nos-white) 40%, transparent);
+  color: var(--nos-white);
+}
+
+.app-snake__pad button:active {
+  background: var(--nos-white);
+  color: var(--nos-black);
+}
+
+.app-snake__pad button:nth-child(1) {
+  grid-area: up;
+}
+
+.app-snake__pad button:nth-child(2) {
+  grid-area: left;
+}
+
+.app-snake__pad button:nth-child(3) {
+  grid-area: down;
+}
+
+.app-snake__pad button:nth-child(4) {
+  grid-area: right;
+}
+
+/* The pad is for touch; with a keyboard and mouse it just takes space. */
+@media (hover: hover) and (pointer: fine) {
+  .app-snake__pad {
+    display: none;
+  }
+}
+
+.app-snake__help {
+  font-size: 1.05rem;
+}
+
+/* ---------- Taskbar ---------- */
+.os-taskbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border-top: 1px solid color-mix(in srgb, var(--nos-white) 35%, transparent);
+  background: var(--nos-surface);
+}
+
+.os-start,
+.os-task {
+  padding: 0 8px;
+  border: 1px solid transparent;
+  color: var(--nos-white);
+  font-family: var(--nos-mono);
+  font-size: 1.25rem;
+  line-height: 1.3;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.os-start:hover,
+.os-start:focus-visible,
+.os-task:hover,
+.os-task:focus-visible {
+  border-color: var(--nos-white);
+  outline: none;
+}
+
+.os-tasks {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+
+.os-task {
+  max-width: 200px;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--nos-white) 30%, transparent);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--nos-dim);
+}
+
+.os-task.is-active {
+  border-color: var(--nos-white);
+  background: var(--nos-white);
+  color: var(--nos-black);
+}
+
+.os-clock {
+  flex: none;
+  font-size: 1.3rem;
+  color: var(--nos-dim);
+}
+
+/* ---------- Narrow screens ---------- */
+.is-compact .os-icons {
+  top: 12px;
+  left: 6px;
+  right: 6px;
+  bottom: auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.is-compact .os-icon {
+  width: 100%;
+}
+
+.is-compact .os-icon__art {
+  height: 38px;
+}
+
+.is-compact .os-wallpaper__mark {
+  display: none;
+}
+
+/* Windows stop short of the floor: Mini Nico stands in that strip. */
+.is-compact .os-window-shell.is-full {
+  inset: 8px 8px 68px;
+}
+
+.is-compact .os-taskbar {
+  backdrop-filter: none;
+}
+
+.is-compact .os-tasks {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .os-icon__art,
+  .os-window__shot img {
+    transition: none;
+  }
+}
+
+/* ---------- Glyph Tide background + draggable icons ---------- */
+.os-desktop {
+  isolation: isolate;
+  background: var(--nos-black);
+}
+
+.os-wall,
+.os-tide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Phones get a still wallpaper: a dot grid and two soft glows. */
+.is-compact .os-wall {
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--nos-violet) 26%, transparent) 1px, transparent 1.6px) 0 0 / 22px 22px,
+    radial-gradient(ellipse 80% 45% at 85% 12%, color-mix(in srgb, var(--nos-violet) 20%, transparent), transparent 70%),
+    radial-gradient(ellipse 80% 45% at 10% 88%, color-mix(in srgb, var(--nos-blue) 16%, transparent), transparent 70%),
+    var(--nos-black);
+}
+
+.os-icons {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.os-icon-slot {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  pointer-events: auto;
+  transition:
+    left 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* While dragged the icon follows the pointer exactly and floats on top. */
+.os-icon-slot.is-dragging {
+  z-index: 30;
+  transition: none;
+  opacity: 0.85;
+}
+
+.os-icon-slot.is-dragging .os-icon {
+  cursor: grabbing;
+  border-color: var(--app);
+}
+
+.os-icon {
+  width: 100%;
+  max-width: 116px;
+  touch-action: none;
+}
+
+/* ---------- Colour theme ---------- */
+.os-icon__art {
+  color: var(--app, var(--nos-white));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--app, #fff) 45%, transparent));
+}
+
+.os-icon__label {
+  padding: 1px 5px;
+  background: var(--nos-label);
+}
+
+.os-icon:hover,
+.os-icon:focus-visible {
+  border-color: var(--app, var(--nos-white));
+  background: color-mix(in srgb, var(--app, #fff) 10%, transparent);
+}
+
+.os-icon.is-open .os-icon__label {
+  background: var(--app, var(--nos-white));
+  color: var(--nos-on-acc);
+  text-shadow: none;
+}
+
+.os-window {
+  border-color: color-mix(in srgb, var(--app, #fff) 35%, transparent);
+  background: var(--nos-surface);
+}
+
+.os-window.is-focused {
+  border-color: var(--app, var(--nos-white));
+  box-shadow:
+    8px 8px 0 var(--nos-shadow),
+    0 0 40px -10px color-mix(in srgb, var(--app, #fff) 45%, transparent);
+}
+
+.os-window__icon {
+  color: var(--app, var(--nos-white));
+}
+
+.os-window.is-focused .os-window__bar {
+  border-bottom-color: var(--app, var(--nos-white));
+  background: var(--app, var(--nos-white));
+  color: var(--nos-on-acc);
+}
+
+.os-window.is-focused .os-window__icon {
+  color: var(--nos-on-acc);
+}
+
+.os-window__body.is-flush {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.app-kicker {
+  color: var(--app, var(--nos-dim));
+}
+
+.app-cta {
+  border-color: var(--app, var(--nos-white));
+  background: var(--app, var(--nos-white));
+  color: var(--nos-on-acc);
+}
+
+.app-cta:hover,
+.app-cta:focus-visible {
+  color: var(--app, var(--nos-white));
+}
+
+.app-tags li,
+.app-mini {
+  border-color: color-mix(in srgb, var(--app, #fff) 55%, transparent);
+}
+
+.app-mini:hover,
+.app-mini:focus-visible {
+  background: var(--app, var(--nos-white));
+}
+
+.os-window__body a:not(.app-cta):not(.app-mini):not([class*='fb-']),
+.app-link {
+  color: var(--app, var(--nos-white));
+}
+
+.app-list b,
+.app-log__org {
+  color: var(--app, var(--nos-white));
+}
+
+.app-stack__bar {
+  color: var(--app, var(--nos-white));
+}
+
+.app-dot {
+  background: var(--nos-green);
+}
+
+.app-about__photo {
+  filter: none;
+}
+
+.app-seg button.is-on,
+.app-seg button:hover,
+.app-seg button:focus-visible {
+  border-color: var(--app, var(--nos-white));
+  background: var(--app, var(--nos-white));
+}
+
+.app-snake__board {
+  border-color: color-mix(in srgb, var(--app, #fff) 60%, transparent);
+}
+
+/* Taskbar and start menu */
+.os-taskbar {
+  border-top-color: rgba(183, 155, 255, 0.35);
+  background: var(--nos-bar);
+  backdrop-filter: blur(6px);
+}
+
+.os-start {
+  background: linear-gradient(90deg, var(--nos-blue), var(--nos-violet), var(--nos-pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.os-start:hover,
+.os-start:focus-visible,
+.os-start.is-on {
+  border-color: var(--nos-violet);
+  background: var(--nos-violet);
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  color: var(--nos-on-acc);
+}
+
+.os-task.is-active {
+  border-color: var(--app, var(--nos-white));
+  background: var(--app, var(--nos-white));
+}
+
+.os-task:hover,
+.os-task:focus-visible {
+  border-color: var(--app, var(--nos-white));
+}
+
+.os-start-menu {
+  border-color: var(--nos-violet);
+}
+
+.os-start-menu__head {
+  background: linear-gradient(90deg, var(--nos-blue), var(--nos-violet), var(--nos-pink));
+}
+
+.os-start-menu button svg {
+  color: var(--app, var(--nos-dim));
+}
+
+.os-start-menu button:hover,
+.os-start-menu button:focus-visible {
+  background: var(--app, var(--nos-white));
+}
+
+.os-start-menu button:hover svg,
+.os-start-menu button:focus-visible svg {
+  color: var(--nos-on-acc);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os-icon-slot {
+    transition: none;
+  }
+}
+
+/* ---------- Terminal (terminal.exe) ---------- */
+.app-term {
+  flex: 1;
+  min-height: 0;
+  padding: 12px 14px 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  font-size: 1.25rem;
+  line-height: 1.22;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--nos-white) 25%, transparent) transparent;
+}
+
+.app-term p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.app-term .nos-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 1.4rem;
+}
+
+.os-window__body .app-term a {
+  color: var(--nos-blue);
+}
+
+.app-term a:hover,
+.app-term a:focus-visible {
+  background: var(--nos-blue);
+  color: var(--nos-black);
+  text-decoration: none;
+  outline: none;
+}
+
+.app-term__line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5ch;
+}
+
+.app-term__line .nos-prompt {
+  flex: none;
+}
+
+/* ---------- Project file ---------- */
+.app-proj {
+  display: grid;
+  gap: 16px;
+}
+
+.app-proj__head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.app-proj__icon {
+  flex: none;
+  width: 76px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--app, #fff) 55%, transparent);
+  background: color-mix(in srgb, var(--app, #fff) 9%, transparent);
+  color: var(--app, var(--nos-white));
+}
+
+.app-proj__icon svg {
+  width: 100%;
+  height: auto;
+}
+
+.app-proj__head .app-title {
+  margin: 0.1rem 0 0.25rem;
+  font-weight: 400;
+}
+
+.app-proj__lede {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+/* The data sheet: four cells in a ruled box. */
+.app-proj__sheet {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border: 1px solid color-mix(in srgb, var(--app, #fff) 40%, transparent);
+}
+
+.app-proj__sheet > div {
+  padding: 6px 10px 7px;
+  border-left: 1px dashed color-mix(in srgb, var(--nos-white) 22%, transparent);
+}
+
+.app-proj__sheet > div:first-child {
+  border-left: 0;
+}
+
+.app-proj__sheet dt {
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--nos-dim);
+}
+
+.app-proj__sheet dd {
+  margin: 0;
+  font-size: 1.22rem;
+  line-height: 1.05;
+}
+
+@container (max-width: 540px) {
+  .app-proj__sheet {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-proj__sheet > div:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .app-proj__sheet > div:nth-child(n + 3) {
+    border-top: 1px dashed color-mix(in srgb, var(--nos-white) 22%, transparent);
+  }
+}
+
+/* The steps: numbered blocks joined by a dashed line. */
+.app-proj__steps {
+  display: grid;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-proj__steps li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: 14px;
+  padding-bottom: 14px;
+}
+
+.app-proj__steps li:last-child {
+  padding-bottom: 0;
+}
+
+.app-proj__steps li:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 1.9rem;
+  bottom: 0;
+  left: 1.25rem;
+  border-left: 1px dashed color-mix(in srgb, var(--app, #fff) 55%, transparent);
+}
+
+.app-proj__num {
+  display: grid;
+  place-items: center;
+  height: 1.9rem;
+  background: var(--app, var(--nos-white));
+  color: var(--nos-on-acc);
+  font-size: 1.25rem;
+}
+
+.app-proj__step {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.app-proj__step + .app-text {
+  margin-top: 0.2rem;
+}
+
+.app-proj__tech {
+  margin-top: 0.4rem;
+}
+
+.app-proj__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding-top: 14px;
+  border-top: 1px dashed color-mix(in srgb, var(--nos-white) 22%, transparent);
+  font-size: 1.15rem;
+}
+
+.app-proj__foot .app-cta {
+  align-self: auto;
+}
+
+/* ---------- Phones: tighter windows ---------- */
+.is-compact .os-window__body:not(.is-flush) {
+  padding: 14px 14px 18px;
+}
+
+.is-compact .app-proj__icon {
+  width: 60px;
+  padding: 9px;
+}
+
+.is-compact .app-list {
+  grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+  gap: 0.15rem 0.9rem;
+}
+
+.is-compact .app-rows > div {
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 0.6rem;
+}
+
+.is-compact .app-stack__list {
+  padding-left: 0.4rem;
+}
+
+.is-compact .app-stack__list li {
+  grid-template-columns: 1.4rem minmax(0, 1fr) auto;
+  gap: 0.6rem;
+}
+
+.is-compact .app-stack__level {
+  display: none;
+}
+
+.is-compact .os-start-menu {
+  max-height: calc(100% - 60px);
+  overflow-y: auto;
+}
+
+.is-compact .os-clock {
+  margin-left: auto;
+}
