@@ -1404,3 +1404,190 @@
 .is-compact .os-clock {
   margin-left: auto;
 }
+
+/* ---------- DOOM (doom.exe) ----------
+   A small retro console: dark bezel, a 16:10 screen (320×200 shown at 2×,
+   scaled down to fit narrower windows), a strip with a power LED and the
+   Mute / Reset buttons. The screen stays dark in both themes. */
+.app-doom {
+  display: grid;
+  gap: 6px;
+}
+
+/* The game window keeps its frame thin so the screen gets the room. */
+.os-window__body.is-snug {
+  padding: 6px 6px 8px;
+}
+
+.app-doom__console {
+  width: 100%;
+  padding: 3px 3px 0;
+  border: 1px solid #2a2a36;
+  background: #15151d;
+}
+
+.app-doom__screen {
+  position: relative;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #000;
+  color: #ecebf5;
+  font-family: var(--nos-mono);
+  text-align: center;
+}
+
+/* The idle / loading screens get the same scanlines as the game. */
+.app-doom__screen.is-idle::after,
+.app-doom__loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
+}
+
+.app-doom__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+}
+
+.app-doom__logo {
+  font-size: clamp(3rem, 12cqw, 5.5rem);
+  line-height: 0.85;
+  letter-spacing: 0.08em;
+  color: #ff5a36;
+  text-shadow:
+    3px 3px 0 #7a1608,
+    0 0 18px rgba(255, 90, 54, 0.45);
+}
+
+.app-doom__note {
+  max-width: 34ch;
+  padding: 0 12px;
+  font-size: 1.2rem;
+  line-height: 1.1;
+}
+
+.app-doom__note.is-dim {
+  color: #8f8cab;
+  font-size: 1.05rem;
+}
+
+.app-doom__start {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 1.1rem;
+  border: 2px solid #ff5a36;
+  background: #ff5a36;
+  color: #120604;
+  font-family: var(--nos-mono);
+  font-size: 1.5rem;
+  letter-spacing: 0.12em;
+  box-shadow: 4px 4px 0 #7a1608;
+  animation: doom-blink 1.2s steps(1) infinite;
+}
+
+.app-doom__start:hover,
+.app-doom__start:focus-visible {
+  background: transparent;
+  color: #ff5a36;
+  outline: none;
+  animation: none;
+}
+
+@keyframes doom-blink {
+  50% {
+    box-shadow: 4px 4px 0 #7a1608, 0 0 0 4px rgba(255, 90, 54, 0.25);
+  }
+}
+
+.app-doom__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+  background: #000;
+}
+
+.app-doom__bar {
+  display: block;
+  width: min(260px, 70cqw);
+  height: 14px;
+  padding: 2px;
+  border: 2px solid #ecebf5;
+}
+
+.app-doom__bar > span {
+  display: block;
+  height: 100%;
+  /* Chunky blocks instead of a smooth fill. */
+  background: repeating-linear-gradient(90deg, #ff5a36 0 8px, transparent 8px 10px);
+  transition: width 0.2s steps(4);
+}
+
+.app-doom__bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 3px;
+  color: #8f8cab;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+}
+
+.app-doom__label {
+  margin-right: auto;
+}
+
+.app-doom__led {
+  width: 8px;
+  height: 8px;
+  background: #3a1a14;
+}
+
+.app-doom__led[data-on='1'] {
+  background: #ff5a36;
+  box-shadow: 0 0 8px #ff5a36;
+}
+
+.app-doom__bar-row .app-mini {
+  border-color: #3a3a4a;
+  color: #ecebf5;
+}
+
+.app-doom__bar-row .app-mini:hover:not(:disabled),
+.app-doom__bar-row .app-mini:focus-visible {
+  background: #ecebf5;
+  color: #15151d;
+}
+
+.app-doom__bar-row .app-mini:disabled {
+  opacity: 0.35;
+}
+
+.app-doom__credits {
+  padding: 0 4px;
+  font-size: 0.85rem;
+  line-height: 1.1;
+  text-align: center;
+  color: var(--nos-dim);
+  opacity: 0.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-doom__start {
+    animation: none;
+  }
+}

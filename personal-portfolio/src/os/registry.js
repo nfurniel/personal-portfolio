@@ -4,6 +4,7 @@ import Project from './apps/Project'
 import TerminalShell from './TerminalShell'
 import Browser from './apps/Browser'
 import Snake from './apps/Snake'
+import Doom from './apps/Doom'
 import { PROJECTS } from './data'
 
 /*
@@ -26,6 +27,7 @@ export const APPS = {
   cv: { icon: 'doc', color: '#ff8a72', width: 640, Component: Cv },
   games: { icon: 'folder', color: '#9dff6e', width: 520, Component: GamesFolder, folder: true },
   snake: { icon: 'snake', color: '#9dff6e', width: 460, Component: Snake },
+  doom: { icon: 'skull', color: '#ff6b4a', width: 780, bodyClass: 'is-snug', Component: Doom },
   settings: { icon: 'gear', color: '#9cc3e0', width: 560, Component: Settings },
   readme: { icon: 'doc', color: '#ecebf5', width: 520, Component: Readme },
 }

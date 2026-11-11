@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DOOM</title>
+    <link rel="icon" href="data:," />
+    <!--
+      The DOOM screen inside Nicolás OS (loaded in an iframe by the doom.exe
+      window, only after START). Chocolate Doom compiled to WebAssembly
+      (cloudflare/doom-wasm, GPL-2.0, build patch in engine-build.patch) running
+      the freely distributable DOOM shareware episode (doom1.wad, © id Software).
+
+      Talks to the window with postMessage:
+        out  { doom: 'progress', value: 0..1 } · { doom: 'ready' } · { doom: 'error' }
+        in   { doom: 'mute', on: bool }
+    -->
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #000;
+      }
+      /* No border or padding on the canvas: SDL maps pointer coordinates 1:1. */
+      #canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        outline: none;
+      }
+      /* Faint scanlines and pixel grid over the picture, like an old monitor. */
+      .crt {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.14) 0 1px, transparent 1px 3px),
+          repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 3px);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" tabindex="0" oncontextmenu="event.preventDefault()"></canvas>
+    <div class="crt" aria-hidden="true"></div>
+    <script>
+      ;(function () {
+        var tell = function (msg) {
+          try {
+            parent.postMessage(Object.assign({ doom: '' }, msg), location.origin)
+          } catch (e) {}
+        }
+
+        // Catch every audio context the engine creates, so the window's Mute
+        // button can suspend them (and the first key press can unlock them).
+        var contexts = []
+        var muted = false
+        var Native = window.AudioContext || window.webkitAudioContext
+        if (Native) {
+          var Patched = function (opts) {
+            var ctx = new Native(opts)
+            contexts.push(ctx)
+            if (muted) ctx.suspend()
+            return ctx
+          }
+          Patched.prototype = Native.prototype
+          window.AudioContext = window.webkitAudioContext = Patched
+        }
+        var applyAudio = function () {
+          contexts.forEach(function (ctx) {
+            if (muted) ctx.suspend()
+            else if (ctx.state !== 'running') ctx.resume()
+          })
+        }
+        addEventListener('keydown', applyAudio, true)
+        // Any click on the game hands it the keyboard.
+        addEventListener('pointerdown', function () {
+          document.getElementById('canvas').focus()
+        }, true)
+        addEventListener('pointerdown', applyAudio, true)
+        addEventListener('message', function (e) {
+          if (e.origin !== location.origin || !e.data || e.data.doom !== 'mute') return
+          muted = !!e.data.on
+          applyAudio()
+        })
+
+        // Keys the browser would otherwise act on (scrolling, back, find…).
+        addEventListener(
+          'keydown',
+          function (e) {
+            if (/^(Arrow|Tab$|Space$|Backspace$|F\d)/.test(e.code) || e.key === ' ') e.preventDefault()
+          },
+          true,
+        )
+
+        // Mouse look. A click on the screen captures the pointer (the engine
+        // asks for it while a level is being played); moving turns, left click
+        // fires, right click opens doors. Esc gives the pointer back AND opens
+        // DOOM's menu in one press: the browser swallows that Esc to release
+        // the pointer, so when the release wasn't the engine's own doing we
+        // press Esc for it.
+        var lastEsc = 0
+        var engineRelease = 0
+        // A refused request (window not focused, too early…) just means the
+        // next click asks again; don't let it surface as an error.
+        var reqLock = HTMLCanvasElement.prototype.requestPointerLock
+        if (reqLock) {
+          HTMLCanvasElement.prototype.requestPointerLock = function () {
+            var p = reqLock.apply(this, arguments)
+            if (p && p.catch) p.catch(function () {})
+            return p
+          }
+        }
+        var exitLock = Document.prototype.exitPointerLock
+        if (exitLock) {
+          document.exitPointerLock = function () {
+            engineRelease = performance.now()
+            return exitLock.call(document)
+          }
+        }
+        addEventListener('keydown', function (e) {
+          if (e.isTrusted && e.code === 'Escape') lastEsc = performance.now()
+        }, true)
+        var pressEsc = function () {
+          var opts = { code: 'Escape', key: 'Escape', keyCode: 27, which: 27, bubbles: true }
+          dispatchEvent(new KeyboardEvent('keydown', opts))
+          setTimeout(function () { dispatchEvent(new KeyboardEvent('keyup', opts)) }, 60)
+        }
+        document.addEventListener('pointerlockchange', function () {
+          var locked = !!document.pointerLockElement
+          if (locked) return
+          var at = performance.now()
+          setTimeout(function () {
+            var byEngine = at - engineRelease < 400
+            var escSeen = Math.abs(lastEsc - at) < 400
+            if (!byEngine && !escSeen && document.hasFocus()) pressEsc()
+          }, 120)
+        })
+
+        // Download the engine and the WAD ourselves, for a real progress bar.
+        var FILES = [
+          { url: 'engine.wasm', size: 7174139 },
+          { url: 'doom1.wad', size: 4196020 },
+          { url: 'default.cfg', size: 2000 },
+          { url: 'chocolate-doom.cfg', size: 300 },
+        ]
+        var total = FILES.reduce(function (n, f) { return n + f.size }, 0)
+        var got = FILES.map(function () { return 0 })
+        var report = function () {
+          var n = got.reduce(function (a, b) { return a + b }, 0)
+          tell({ doom: 'progress', value: Math.min(0.99, n / total) })
+        }
+        var load = function (f, i) {
+          return fetch(f.url).then(function (res) {
+            if (!res.ok) throw new Error(f.url + ' ' + res.status)
+            if (!res.body || !res.body.getReader) return res.arrayBuffer()
+            var reader = res.body.getReader()
+            var parts = []
+            var pump = function () {
+              return reader.read().then(function (r) {
+                if (r.done) {
+                  var out = new Uint8Array(got[i])
+                  var at = 0
+                  parts.forEach(function (p) { out.set(p, at); at += p.length })
+                  return out.buffer
+                }
+                parts.push(r.value)
+                got[i] += r.value.length
+                report()
+                return pump()
+              })
+            }
+            return pump()
+          })
+        }
+
+        Promise.all(FILES.map(load))
+          .then(function (data) {
+            window.Module = {
+              canvas: document.getElementById('canvas'),
+              wasmBinary: data[0],
+              noInitialRun: true,
+              locateFile: function (p) { return p.slice(-5) === '.wasm' ? 'engine.wasm' : p },
+              preRun: [
+                function () {
+                  Module.FS.writeFile('/doom1.wad', new Uint8Array(data[1]))
+                  Module.FS.writeFile('/default.cfg', new Uint8Array(data[2]))
+                  Module.FS.writeFile('/chocolate-doom.cfg', new Uint8Array(data[3]))
+                },
+              ],
+              onRuntimeInitialized: function () {
+                tell({ doom: 'ready' })
+                document.getElementById('canvas').focus()
+                Module.callMain([
+                  '-iwad', 'doom1.wad', '-window', '-nogui', '-nomusic',
+                  '-config', 'default.cfg', '-extraconfig', 'chocolate-doom.cfg',
+                  // Straight into E1M1 (no title demos), on "Hurt me plenty".
+                  '-warp', '1', '1', '-skill', '3',
+                ])
+              },
+              print: function () {},
+              printErr: function () {},
+            }
+            var s = document.createElement('script')
+            s.src = 'engine.js'
+            s.onerror = function () { tell({ doom: 'error' }) }
+            document.body.appendChild(s)
+          })
+          .catch(function () { tell({ doom: 'error' }) })
+
+        // Only a failure before the game starts counts as "couldn't load".
+        var started = false
+        addEventListener('message', function () {}, false)
+        var origTell = tell
+        tell = function (msg) {
+          if (msg.doom === 'ready') started = true
+          origTell(msg)
+        }
+        window.addEventListener('error', function () {
+          if (!started) tell({ doom: 'error' })
+        })
+      })()
+    </script>
+  </body>
+</html>

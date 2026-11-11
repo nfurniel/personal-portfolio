@@ -28,7 +28,7 @@ const fill = (text, params) => Object.entries(params).reduce((s, [k, v]) => s.re
 const ANIM_MS = { hop: 420, shake: 380, squash: 320, stomp: 720, fall: 520, getup: 380, wobble: 2200 }
 const FX = { zzz: 'z Z', steam: '#!@', sweat: "'", stars: '* + *', alert: '!', dots: '. . .', spark: '+', code: '1 0 1', sun: '\\ | /', moon: 'z' }
 // Windows he reacts to in a special way (face + effect), and every time.
-const REACT = { terminal: { face: 'cool', fx: 'code' }, project: { face: 'happy', fx: 'spark' }, settings: { face: 'neutral', fx: null } }
+const REACT = { terminal: { face: 'cool', fx: 'code' }, project: { face: 'happy', fx: 'spark' }, settings: { face: 'neutral', fx: null }, doom: { face: 'angry', fx: 'steam' } }
 const MENU_APPS = ['projects', 'contact', 'games', 'browser']
 const OPPOSITE = { left: 'right', right: 'left', up: 'down', down: 'up' }
 

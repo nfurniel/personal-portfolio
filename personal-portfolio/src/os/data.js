@@ -50,7 +50,7 @@ export const DESKTOP = ['browser', 'projects', 'about', 'career', 'stack', 'cont
 // What the folders contain.
 export const FOLDERS = {
   projects: PROJECTS.map((p) => ({ app: 'project', params: { id: p.id } })),
-  games: [{ app: 'snake' }],
+  games: [{ app: 'snake' }, { app: 'doom' }],
 }
 
 // The CV in Spanish for the Spanish site, in English for English and French.
