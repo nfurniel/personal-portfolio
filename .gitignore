@@ -1,0 +1,5 @@
+# Dependencies are installed per app (personal-portfolio/)
+node_modules/
+
+# Local Claude Code state
+.claude/
