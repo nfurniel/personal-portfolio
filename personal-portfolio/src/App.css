@@ -1,97 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Fraunces:opsz,wght@9..144,300..900&display=swap');
+/* Base reset. Everything else is styled by Nicolás OS (src/os). */
 
-:root {
-  /* light theme tokens (mirror rbp-portfolio) */
-  --background: #ffffff;
-  --foreground: #0a0a0a;
-  --muted: #f5f5f5;
-  --muted-foreground: #737373;
-  --border: #e5e5e5;
-  --ring: #0066ff;
-
-  --card: #ffffff;
-  --card-foreground: #0a0a0a;
-
-  --accent: #0066ff;
-  --accent-soft: rgba(0, 102, 255, 0.08);
-
-  --foreground-65: rgba(10, 10, 10, 0.65);
-  --foreground-8: rgba(10, 10, 10, 0.08);
-  --foreground-12: rgba(10, 10, 10, 0.12);
-
-  --shadow-sm: 0 1px 2px rgba(10, 10, 10, 0.05);
-  --shadow-md: 0 4px 14px rgba(10, 10, 10, 0.06);
-  --shadow-lg: 0 16px 40px rgba(10, 10, 10, 0.08);
-
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
-  --radius-2xl: 32px;
-
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-
-  --max-w: 68.75rem; /* 1100px ~ max-w-275 in tailwind */
-
-  --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', monospace;
-  --font-serif: 'Fraunces', Georgia, serif;
-}
-
-.dark,
-[data-theme='dark'] {
-  --background: #0a0a0a;
-  --foreground: #fafafa;
-  --muted: #171717;
-  --muted-foreground: #a3a3a3;
-  --border: #262626;
-  --ring: #3b82f6;
-
-  --card: #111111;
-  --card-foreground: #fafafa;
-
-  --accent: #3b82f6;
-  --accent-soft: rgba(59, 130, 246, 0.14);
-
-  --foreground-65: rgba(250, 250, 250, 0.65);
-  --foreground-8: rgba(250, 250, 250, 0.08);
-  --foreground-12: rgba(250, 250, 250, 0.12);
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
-}
-
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html {
-  font-family: var(--font-sans);
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  background: #050507;
+  color: #ecebf5;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  color: var(--foreground);
-  background: var(--background);
-}
-
-body {
-  width: 100%;
-  min-height: 100vh;
-  background: var(--background);
-  color: var(--foreground);
-  overflow-x: hidden;
-  font-family: var(--font-sans);
-  transition: background-color 0.3s var(--ease), color 0.3s var(--ease);
 }
 
 img {
+  display: block;
   max-width: 100%;
   height: auto;
-  display: block;
 }
 
 a {
@@ -100,257 +31,13 @@ a {
 }
 
 button {
-  font-family: inherit;
-  cursor: pointer;
   border: none;
   background: none;
   color: inherit;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 ::selection {
-  background: var(--accent-soft);
-  color: var(--foreground);
-}
-
-/* View Transition: circular reveal on theme switch */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-::view-transition-old(root) {
-  z-index: 1;
-}
-
-::view-transition-new(root) {
-  z-index: 2;
-}
-
-[data-vt-direction='to-dark']::view-transition-new(root) {
-  animation: vt-reveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-[data-vt-direction='to-light']::view-transition-new(root) {
-  animation: vt-reveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@keyframes vt-reveal {
-  from {
-    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%));
-  }
-  to {
-    clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 50%));
-  }
-}
-
-/* View Transition: soft crossfade on language switch */
-[data-vt-lang]::view-transition-old(root) {
-  animation: vt-lang-out 0.3s ease forwards;
-}
-[data-vt-lang]::view-transition-new(root) {
-  animation: vt-lang-in 0.38s ease 0.05s both;
-}
-
-@keyframes vt-lang-out {
-  to { opacity: 0; }
-}
-@keyframes vt-lang-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Fallback fade for browsers without View Transitions */
-.site {
-  transition: opacity 0.25s ease;
-}
-html.lang-switching .site {
-  opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none !important;
-  }
-}
-
-/* lenis scroll smoothing */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-/* shared focus ring */
-.focus-ring:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 3px;
-  border-radius: 999px;
-}
-
-/* ---------- LAYOUT ---------- */
-.site {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  min-height: 100dvh;
-  isolation: isolate;
-}
-
-.main {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: clamp(5rem, 11vw, 7rem);
-}
-
-.container {
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-  max-width: var(--max-w);
-  padding-left: clamp(1.25rem, 4vw, 2.5rem);
-  padding-right: clamp(1.25rem, 4vw, 2.5rem);
-}
-
-/* ---------- TYPOGRAPHY ---------- */
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--muted-foreground);
-  text-transform: uppercase;
-}
-
-.h-display {
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: clamp(2.4rem, 6vw, 3.65rem);
-  line-height: 1.05;
-  letter-spacing: -0.035em;
-  color: var(--foreground);
-}
-
-.h-section {
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: clamp(1.6rem, 3vw, 2rem);
-  line-height: 1.1;
-  letter-spacing: -0.025em;
-  color: var(--foreground);
-}
-
-.lede {
-  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-  line-height: 1.4;
-  letter-spacing: -0.01em;
-  color: var(--foreground-65);
-  max-width: 34ch;
-}
-
-/* ---------- BUTTONS ---------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.7rem 1.1rem;
-  border-radius: 12px;
-  font-size: 0.92rem;
-  font-weight: 500;
-  letter-spacing: -0.005em;
-  transition: background 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease), color 0.2s var(--ease);
-  white-space: nowrap;
-}
-
-.btn-primary {
-  background: var(--foreground);
-  color: var(--background);
-  border: 1px solid var(--foreground);
-  box-shadow: var(--shadow-sm);
-}
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn-ghost {
-  background: var(--muted);
-  color: var(--foreground);
-  border: 1px solid var(--border);
-}
-.btn-ghost:hover {
-  background: var(--background);
-  border-color: var(--foreground-12);
-}
-
-.btn-arrow svg {
-  transition: transform 0.25s var(--ease);
-}
-.btn-arrow:hover svg {
-  transform: translateX(2px);
-}
-
-/* ---------- SHARED CARD STYLE ---------- */
-.card-surface {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-}
-
-/* ---------- FOOTER ---------- */
-.site-footer {
-  padding: 2rem 0;
-  margin-top: clamp(4rem, 8vw, 6rem);
-  border-top: 1px solid var(--border);
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--muted-foreground);
-  background: var(--background);
-  position: relative;
-  z-index: 1;
-}
-
-/* ---------- PRELOADER OVERRIDES ---------- */
-/* Force fixed positioning to beat .preloader-percentage's `position: absolute` declared later */
-.preloader-percentage.preloader-fixed,
-.preloader-stairs.preloader-fixed,
-.preloader-circle.preloader-fixed,
-.preloader-custom.preloader-fixed {
-  position: fixed;
-  inset: 0;
-}
-.preloader-wrapper {
-  min-height: 100dvh;
-}
-/* Loading text — white on the dark preloader background.
-   Uses !important to override the preloader's broken `hsl(var(--token))` rules. */
-.preloader-loading-text-wrapper .preloader-loading-text-word,
-.preloader-loading-text .preloader-loading-text-word {
-  color: #ffffff !important;
-  font-family: var(--font-sans) !important;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  font-size: clamp(2rem, 6vw, 4rem);
-}
-
-/* ---------- REDUCED MOTION ---------- */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
+  background: rgba(183, 155, 255, 0.35);
 }
