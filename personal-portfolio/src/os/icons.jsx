@@ -2,7 +2,7 @@
  * Pixel-art icons for Nicolás OS, in the same blocky style as the banner:
  * one per project (bus, document under a magnifier, house, star) and one per
  * folder or app (folder, user, briefcase, chip, mail, doc, gamepad, gear,
- * snake, terminal). Each '#' is one pixel, drawn as a single path in the text colour.
+ * snake, terminal, pc, note). Each '#' is one pixel, drawn as a single path in the text colour.
  */
 
 const ICONS = {
@@ -223,6 +223,33 @@ const ICONS = {
     '....##########..',
     '....#.#.#.#.#...',
     '.....#.#.#.#....',
+  ],
+  pc: [
+    '################',
+    '#..............#',
+    '#.############.#',
+    '#.############.#',
+    '#.############.#',
+    '#.############.#',
+    '#.############.#',
+    '#..............#',
+    '################',
+    '......####......',
+    '......####......',
+    '...##########...',
+  ],
+  note: [
+    '.....###########',
+    '.....###########',
+    '.....##.......##',
+    '.....##.......##',
+    '.....##.......##',
+    '.....##.......##',
+    '.....##.......##',
+    '..#####....#####',
+    '.######...######',
+    '.######...######',
+    '..####.....####.',
   ],
 }
 

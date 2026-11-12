@@ -2,7 +2,8 @@
    See Room.jsx. The camera (.nos-cam) holds the room and the terminal card;
    flying it in makes the Nicolás OS window on the monitor become the page. */
 
-.nos-cam {
+.nos-cam,
+.nos-cam__zoom {
   position: absolute;
   inset: 0;
 }
@@ -15,6 +16,42 @@
 
 .nos-stage.is-room.is-zoomed .nos-cam {
   transform: var(--cam-zoom, none);
+}
+
+/* Phones: the zoom goes on an inner layer, on a curve that makes it feel even
+   (room-layout.js) where browsers can, while the camera moves on the usual
+   one. */
+.nos-stage.is-phone.is-room .nos-cam,
+.nos-stage.is-phone.is-room .nos-cam__zoom {
+  transform-origin: var(--cam-origin, 50% 50%);
+  transition: transform var(--cam-dur, 1.5s) cubic-bezier(0.55, 0, 0.25, 1);
+}
+
+.nos-stage.is-phone.is-room.is-zoomed .nos-cam__zoom {
+  transform: var(--cam-scale, none);
+}
+
+.nos-stage.is-phone.is-room.is-snap .nos-cam,
+.nos-stage.is-phone.is-room.is-snap .nos-cam__zoom {
+  transition: none;
+}
+
+@supports (transition-timing-function: linear(0, 1)) {
+  .nos-stage.is-phone.is-room .nos-cam__zoom {
+    transition-timing-function: var(--cam-ease-out, ease);
+  }
+
+  .nos-stage.is-phone.is-room.is-zoomed .nos-cam__zoom {
+    transition-timing-function: var(--cam-ease, ease);
+  }
+}
+
+/* Phones, once inside: the room as the camera left it. */
+.nos-room__held {
+  position: absolute;
+  inset: 0;
+  transform-origin: var(--cam-origin, 50% 50%);
+  transform: var(--cam-zoom, none) var(--cam-scale, scale(1));
 }
 
 /* Coming back from the system: start inside the monitor, no animation. */
@@ -37,7 +74,7 @@
   top: 0;
   left: 0;
   z-index: 3;
-  width: 476px;
+  width: 476px; /* or the phone picture's 480 × 270, from room-layout.js */
   height: 268px;
   transform-origin: 0 0;
   pointer-events: none;
@@ -53,14 +90,14 @@
   pointer-events: none;
 }
 
-.nos-room__art img,
+.nos-room__art > img:first-child,
 .nos-room__fx,
 .nos-room__rain {
   position: absolute;
   inset: 0;
   display: block;
-  width: 476px;
-  height: 268px;
+  width: 100%;
+  height: 100%;
   max-width: none;
   image-rendering: pixelated;
   user-select: none;
@@ -153,14 +190,153 @@
 .nos-room__icons svg {
   width: auto;
   height: 50px;
-  color: #eaf6ff;
   filter: drop-shadow(3px 3px 0 rgba(8, 28, 74, 0.6));
 }
 
 .nos-room__icons span {
+  color: #fff;
   font-size: 1.5rem;
   line-height: 1;
   text-shadow: 2px 2px 0 rgba(8, 28, 74, 0.85);
+}
+
+/* A little music player, beside the icons (the head covers what is below). */
+.nos-room__player {
+  --u: 1px;
+  position: absolute;
+  top: calc(22 * var(--u));
+  left: calc(136 * var(--u));
+  display: grid;
+  width: calc(150 * var(--u));
+  border: calc(2 * var(--u)) solid #0d1a14;
+  background: #121212;
+  color: #fff;
+  font-size: calc(17 * var(--u));
+  line-height: 1;
+  box-shadow: calc(5 * var(--u)) calc(5 * var(--u)) 0 rgba(8, 28, 74, 0.55);
+  transform-origin: 50% 320%;
+  transition:
+    transform 0.35s steps(6),
+    opacity 0.35s steps(6);
+}
+
+/* Closed for a moment: it drops towards the taskbar. */
+.nos-room__player.is-closed {
+  opacity: 0;
+  transform: scale(0.1);
+}
+
+.nos-room__player p {
+  margin: 0;
+}
+
+.nos-room__player-bar {
+  display: flex;
+  align-items: center;
+  gap: calc(5 * var(--u));
+  padding: calc(3 * var(--u)) calc(5 * var(--u));
+  background: #1ed760;
+  color: #0d1a14;
+}
+
+.nos-room__player-bar svg {
+  width: auto;
+  height: calc(12 * var(--u));
+}
+
+.nos-room__player-bar i {
+  margin-left: auto;
+  font-style: normal;
+}
+
+.nos-room__player-body {
+  display: grid;
+  justify-items: center;
+  gap: calc(4 * var(--u));
+  padding: calc(8 * var(--u)) calc(8 * var(--u)) calc(4 * var(--u));
+  animation: room-track 0.5s steps(5) both;
+}
+
+@keyframes room-track {
+  from {
+    opacity: 0;
+    transform: translateX(calc(20 * var(--u)));
+  }
+}
+
+/* The cover: two colours in a few hard shapes, a different pair per song. */
+.nos-room__cover {
+  width: calc(84 * var(--u));
+  height: calc(84 * var(--u));
+  background:
+    radial-gradient(circle at 70% 30%, var(--a) 0 22%, transparent 22%),
+    linear-gradient(135deg, transparent 0 50%, rgba(0, 0, 0, 0.28) 50%),
+    linear-gradient(var(--b) 0 62%, var(--a) 62% 70%, var(--b) 70% 78%, var(--a) 78%);
+}
+
+.nos-room__player-body b {
+  max-width: 100%;
+  overflow: hidden;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nos-room__player-body > span:not([class]) {
+  color: #9aa0a6;
+  font-size: calc(15 * var(--u));
+}
+
+.nos-room__progress {
+  width: 100%;
+  height: calc(4 * var(--u));
+  margin-top: calc(2 * var(--u));
+  background: #3a3a3a;
+}
+
+.nos-room__progress i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #1ed760;
+  transform-origin: 0 50%;
+  animation: room-progress 20s steps(40) both;
+}
+
+@keyframes room-progress {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Previous, pause, next: drawn with borders. */
+.nos-room__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(14 * var(--u));
+  padding: calc(4 * var(--u)) 0 calc(8 * var(--u));
+}
+
+.nos-room__controls i {
+  width: 0;
+  height: 0;
+  border: calc(6 * var(--u)) solid transparent;
+}
+.nos-room__controls .is-prev {
+  border-right-color: #fff;
+  border-left-width: 0;
+}
+.nos-room__controls .is-next {
+  border-left-color: #fff;
+  border-right-width: 0;
+}
+.nos-room__controls .is-pause {
+  width: calc(12 * var(--u));
+  height: calc(14 * var(--u));
+  border: 0;
+  border-right: calc(4 * var(--u)) solid #fff;
+  border-left: calc(4 * var(--u)) solid #fff;
 }
 
 /* Taskbar: glass in two bands, a round start orb, pinned programs, a tray. */
@@ -217,6 +393,9 @@
 .nos-room__pin svg {
   width: auto;
   height: 28px;
+}
+
+.nos-room__pin.is-open {
   color: #eaf6ff;
 }
 
@@ -373,24 +552,130 @@
 
 /* ---------- What moves in the picture ---------- */
 
-/* Strips of 60 frames, one under the other, from the same 10 s loop. */
+/* Strips of frames, one under the other (--n of them, --h tall each). */
 .nos-room__sprite {
   position: absolute;
   background-repeat: no-repeat;
   background-position: 0 0;
   image-rendering: pixelated;
-  animation: room-strip 10s steps(60) infinite;
+  animation: room-strip var(--dur, 10s) steps(var(--n, 60)) infinite;
 }
 
 @keyframes room-strip {
   to {
-    background-position: 0 calc(var(--h) * -60);
+    background-position: 0 calc(var(--h) * -1 * var(--n, 60));
   }
+}
+
+/* Stepped from Room.jsx: the cat sleeps and acts now and then; the person
+   on phones types and nods. */
+.nos-room__sprite.is-cat,
+.nos-room__sprite.is-guy {
+  animation: none;
+}
+
+/* ---------- Phones: into the monitor ----------
+   As the camera reaches the monitor, the whole stage is cut to a circle on it
+   that closes to black; the system then fades in. Out, the reverse: fade to
+   black, the circle opens on the monitor and the camera flies out. */
+.nos-stage.is-phone {
+  transition:
+    opacity 0.4s ease,
+    clip-path 0.6s cubic-bezier(0.2, 0.6, 0.35, 1);
+}
+
+.nos-stage.is-phone.is-iris-open {
+  clip-path: circle(80% at 50% 50%);
+}
+
+.nos-stage.is-phone.is-iris-closed {
+  clip-path: circle(0 at 50% 50%);
+  transition:
+    opacity 0.4s ease,
+    clip-path 0.6s cubic-bezier(0.55, 0, 0.8, 0.45);
+}
+
+.nos-stage.is-phone.is-dark {
+  opacity: 0;
+}
+
+.nos-stage.is-phone.is-snap {
+  transition: none;
+}
+
+/* ---------- Phones: more room above and below the picture ---------- */
+.nos-room__ext {
+  position: absolute;
+  left: 0;
+  display: block;
+  max-width: none;
+  image-rendering: pixelated;
+  user-select: none;
+}
+
+.nos-room__glow {
+  position: absolute;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+/* The neon sign is lit, but for a flicker now and then. */
+.nos-room__glow.is-neon {
+  animation: room-neon 7s steps(1) infinite;
+}
+
+@keyframes room-neon {
+  0%,
+  61% {
+    opacity: 1;
+  }
+  61.5% {
+    opacity: 0.2;
+  }
+  62.5% {
+    opacity: 1;
+  }
+  64% {
+    opacity: 0.2;
+  }
+  66% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.nos-room__glow.is-stars {
+  opacity: 0;
+  animation: room-twinkle 5.3s steps(1) infinite;
+}
+
+/* One-pixel lights that blink. */
+.nos-room__led {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  background: currentColor;
+  animation: nos-blink 2.4s steps(1) infinite;
+}
+
+/* Behind the running system nothing needs to move. */
+.nos-room__art.is-frozen * {
+  animation-play-state: paused;
+}
+
+/* Pause the scenery in background tabs, including the desk's pseudo-elements.
+   Keep the foreground animations and the camera transitions unchanged. */
+.nos-page.is-page-hidden :is(.nos-room__art, .nos-room__desk) *,
+.nos-page.is-page-hidden :is(.nos-room__art, .nos-room__desk) *::before,
+.nos-page.is-page-hidden :is(.nos-room__art, .nos-room__desk) *::after {
+  animation-play-state: paused;
 }
 
 /* Layers switched in hard steps. */
 .nos-room__fx {
-  background-size: 476px 268px;
+  background-size: 100% 100%;
   opacity: 0;
   animation: room-twinkle 2.8s steps(1) infinite;
 }
@@ -499,6 +784,10 @@
     font-size: 1.1rem;
   }
 
+  .nos-room__player {
+    --u: 0.52px;
+  }
+
   .nos-room__taskbar {
     gap: 5px;
     padding-left: 6px;
@@ -538,11 +827,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nos-stage.is-room .nos-cam {
+  .nos-stage.is-room .nos-cam,
+  .nos-stage.is-phone,
+  .nos-room__player {
     transition: none;
   }
 
   .nos-room__sprite,
+  .nos-room__glow,
+  .nos-room__led,
+  .nos-room__player-body,
+  .nos-room__progress i,
   .nos-stage.is-room .nos-typed,
   .nos-room__wall::before,
   .nos-room__wall::after,
