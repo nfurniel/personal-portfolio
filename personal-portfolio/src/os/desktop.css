@@ -604,6 +604,10 @@
   gap: 0.8rem;
 }
 
+.app-stack__group {
+  padding-left: 1.2rem;
+}
+
 .app-stack__icon {
   display: inline-flex;
   color: var(--nos-white);

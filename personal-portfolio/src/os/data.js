@@ -11,8 +11,8 @@ export const PROJECTS = [
     file: 'QuickArrival.app',
     icon: 'bus',
     color: '#ffcf5c',
-    tech: ['React', 'JavaScript', 'Node.js'],
-    href: 'https://quick-arrival-app.vercel.app',
+    tech: ['React', 'Node.js', 'Vercel Edge', 'Supabase', 'Leaflet'],
+    href: 'https://quickarrival.es',
   },
   {
     id: 'veta',
@@ -20,7 +20,7 @@ export const PROJECTS = [
     file: 'Veta.exe',
     icon: 'veta',
     color: '#6ef2b0',
-    tech: ['Next.js', 'TypeScript', 'RAG'],
+    tech: ['Next.js', 'Python', 'pgvector', 'Gemini', 'RAG'],
     href: 'https://veta-pi.vercel.app/',
   },
   {
@@ -29,7 +29,7 @@ export const PROJECTS = [
     file: 'CasasMadera.html',
     icon: 'house',
     color: '#ff8a72',
-    tech: ['React', 'GSAP', 'Vite'],
+    tech: ['React', 'Tailwind CSS', 'GSAP', 'Three.js', 'Puppeteer'],
     href: 'https://casasmaderavip.es/',
   },
   {
@@ -38,7 +38,7 @@ export const PROJECTS = [
     file: 'cosmos-api.py',
     icon: 'star',
     color: '#b79bff',
-    tech: ['Python', 'FastAPI', 'REST'],
+    tech: ['Python', 'FastAPI', 'Pydantic', 'OpenAPI', 'Render'],
     href: 'https://cosmos-api-production.onrender.com/docs',
   },
 ]

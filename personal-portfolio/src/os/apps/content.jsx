@@ -64,31 +64,39 @@ export function Career() {
 }
 
 /* stack.json */
-const LEVEL = { Avanzado: 5, Intermedio: 3 }
+const LEVEL = { Avanzado: 5, 'Medio-alto': 4, Intermedio: 3, Básico: 2 }
 export function Stack() {
   const { t } = useI18n()
+  const groups = portfolioData.stack
   return (
     <div className="app-stack">
-      <p className="app-kicker">{'{'} "stack": [</p>
-      <ul className="app-stack__list">
-        {portfolioData.skills.map((s) => {
-          const n = LEVEL[s.level] ?? 3
-          return (
-            <li key={s.name}>
-              <span className="app-stack__icon" aria-hidden="true">
-                {s.icon}
-              </span>
-              <span className="app-stack__name">"{s.name}"</span>
-              <span className="app-stack__bar" aria-label={t.nos.stack.levels[s.level] ?? s.level}>
-                {'▮'.repeat(n)}
-                <span className="app-dim">{'▯'.repeat(5 - n)}</span>
-              </span>
-              <span className="app-dim app-stack__level">{t.nos.stack.levels[s.level] ?? s.level}</span>
-            </li>
-          )
-        })}
-      </ul>
-      <p className="app-kicker">] {'}'}</p>
+      <p className="app-kicker">{'{'}</p>
+      {groups.map((g, gi) => (
+        <section key={g.group} className="app-stack__group">
+          <p className="app-kicker">"{g.group}": [</p>
+          <ul className="app-stack__list">
+            {g.items.map((s) => {
+              const n = LEVEL[s.level] ?? 3
+              const level = t.nos.stack.levels[s.level] ?? s.level
+              return (
+                <li key={s.name}>
+                  <span className="app-stack__icon" aria-hidden="true">
+                    {s.icon}
+                  </span>
+                  <span className="app-stack__name">"{s.name}"</span>
+                  <span className="app-stack__bar" aria-label={level}>
+                    {'▮'.repeat(n)}
+                    <span className="app-dim">{'▯'.repeat(5 - n)}</span>
+                  </span>
+                  <span className="app-dim app-stack__level">{level}</span>
+                </li>
+              )
+            })}
+          </ul>
+          <p className="app-kicker">]{gi < groups.length - 1 ? ',' : ''}</p>
+        </section>
+      ))}
+      <p className="app-kicker">{'}'}</p>
     </div>
   )
 }
