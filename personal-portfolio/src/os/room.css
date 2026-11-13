@@ -606,6 +606,7 @@
 /* ---------- Phones: more room above and below the picture ---------- */
 .nos-room__ext {
   position: absolute;
+  z-index: -1; /* under the picture where they overlap it */
   left: 0;
   display: block;
   max-width: none;

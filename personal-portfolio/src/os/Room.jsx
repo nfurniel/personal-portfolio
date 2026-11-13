@@ -193,11 +193,13 @@ const at = (x, y, w, h, name) => ({ left: x, top: y, width: w, height: h, backgr
 function Beyond() {
   return (
     <>
+      {/* Each goes one row into the picture, underneath it (room.css), so that
+          no hairline shows where they meet at any scale. */}
       <img
         className="nos-room__ext"
         src="/room/m-top.png"
         width="480"
-        height="128"
+        height="129"
         alt=""
         draggable={false}
         style={{ top: -128 }}
@@ -206,10 +208,10 @@ function Beyond() {
         className="nos-room__ext"
         src="/room/m-bottom.png"
         width="480"
-        height="176"
+        height="177"
         alt=""
         draggable={false}
-        style={{ top: 270 }}
+        style={{ top: 269 }}
       />
       {/* the neon sign, lit (it flickers), and the glow-in-the-dark stars */}
       <i className="nos-room__glow is-neon" style={at(196, -96, 60, 36, 'm-neon')} />
@@ -221,7 +223,7 @@ function Beyond() {
       />
       <i className="nos-room__led" style={{ left: 263, top: -42, color: '#6ef2b0', animationDuration: '3.1s' }} />
       {/* the old tower under the desk: the light under its power button blinks */}
-      <i className="nos-room__led" style={{ left: 323, top: 326, width: 2, color: '#ffc08a' }} />
+      <i className="nos-room__led" style={{ left: 323, top: 324, width: 3, color: '#ffc08a' }} />
     </>
   )
 }
