@@ -17,8 +17,8 @@ import './room.css'
  * frames (one under the other, stepped with background-position):
  *   head, hands   nodding and typing, looped
  *   steam         over the mug, cross-faded into a seamless loop
- *   cat           asleep (breathing); every 10–15 s it either has a long
- *                 stretch or wakes to lick its paws, then sleeps again
+ *   cat           asleep (breathing); every 10 s it wakes for a long
+ *                 stretch, then curls up and sleeps again
  * Over the picture, full-frame layers switch on and off (fairy lights, city
  * windows) and a thin rain falls on the glass.
  *
@@ -69,38 +69,14 @@ function strip(name) {
 /* ---------- The cat ---------- */
 
 // Frames of cat.png: 0–22 asleep, 23–59 waking, stretching and curling up
-// again; 60 and 61 are 25 and 26 with the tongue out.
+// again (60 and 61 are left over and not shown).
 const CAT = { box: [344, 144, 132, 124], fps: 6 }
 const range = (a, b) => Array.from({ length: Math.abs(b - a) + 1 }, (_, i) => (b >= a ? a + i : a - i))
-const SLEEP = [...range(0, 22), ...range(21, 1)] // breathing, there and back
-const ACTIONS = {
-  stretch: range(23, 59),
-  // wake, lower the head to the paws and lick a few times, settle back
-  lick: [
-    ...range(23, 27),
-    27,
-    26,
-    60,
-    61,
-    60,
-    26,
-    60,
-    61,
-    60,
-    26,
-    27,
-    26,
-    60,
-    61,
-    60,
-    61,
-    60,
-    26,
-    27,
-    27,
-    ...range(27, 23),
-  ],
-}
+// Ten seconds of breathing, ending on frame 22, where the clip wakes up from;
+// the stretch ends curled up, where frame 0 carries on.
+const NAP = [...range(0, 22), ...range(21, 3), ...range(4, 22)]
+const CAT_LOOP = [...NAP, ...range(23, 59)]
+const CAT_START = NAP.length - 4 * CAT.fps // the first stretch comes after four seconds
 
 function Cat({ frozen }) {
   const ref = useRef(null)
@@ -108,29 +84,10 @@ function Cat({ frozen }) {
     if (frozen || reducedMotion()) return
     const el = ref.current
     const h = CAT.box[3]
-    let seq = SLEEP
-    let i = 0
-    let next = performance.now() + 4000 + Math.random() * 4000 // the first one comes soon
-    let last = 'lick'
+    let i = CAT_START
     return visibleInterval(() => {
-      i += 1
-      if (seq === SLEEP) {
-        // Only from the top of a breath (frame 22), where the clip continues.
-        if (SLEEP[i % SLEEP.length] === 22 && performance.now() > next) {
-          // Mostly take turns; now and then the same one twice.
-          const other = last === 'lick' ? 'stretch' : 'lick'
-          last = Math.random() < 0.75 ? other : last
-          seq = ACTIONS[last]
-          i = 0
-        }
-      } else if (i >= seq.length) {
-        // The lick rewinds to frame 23, the stretch ends curled up: carry on
-        // from the matching point of the sleep cycle.
-        i = seq === ACTIONS.lick ? 23 : 0
-        seq = SLEEP
-        next = performance.now() + 10000 + Math.random() * 5000
-      }
-      el.style.backgroundPositionY = `${-h * seq[i % seq.length]}px`
+      i = (i + 1) % CAT_LOOP.length
+      el.style.backgroundPositionY = `${-h * CAT_LOOP[i]}px`
     }, 1000 / CAT.fps)
   }, [frozen])
 
